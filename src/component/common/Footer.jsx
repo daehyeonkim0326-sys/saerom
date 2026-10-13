@@ -16,6 +16,40 @@ const Footer = () => {
         </div>
         <p className='site-footer__address'>강원특별자치도 원주시 늘품로 126 새롬 인테리어</p>
         <p className='site-footer__copyright'>© {new Date().getFullYear()} 새롬 인테리어</p>
+        <nav className='site-footer__socials' aria-label='새롬 인테리어 소셜 미디어'>
+          <a
+            href='https://naver.me/xNLZbbIk'
+            target='_blank'
+            rel='noreferrer'
+            aria-label='네이버 플레이스 새 탭에서 열기'
+            title='네이버'
+          >
+            <span aria-hidden='true'>N</span>
+          </a>
+          <a
+            href='https://www.instagram.com/saerom.interior/?hl=ko'
+            target='_blank'
+            rel='noreferrer'
+            aria-label='인스타그램 새 탭에서 열기'
+            title='인스타그램'
+          >
+            <svg
+              viewBox='0 0 24 24'
+              width='19'
+              height='19'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth='2'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              aria-hidden='true'
+            >
+              <rect x='3' y='3' width='18' height='18' rx='5' />
+              <circle cx='12' cy='12' r='4' />
+              <circle cx='17.5' cy='6.5' r='0.75' fill='currentColor' stroke='none' />
+            </svg>
+          </a>
+        </nav>
       </div>
     </footer>
   )

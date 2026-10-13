@@ -177,5 +177,19 @@
         grid-template-columns: 105px minmax(0, 1fr);
       }
     }
+
+    @media (min-width: 681px) and (max-width: 900px) {
+      .admin-consultations {
+        padding: 40px 24px 64px;
+      }
+
+      .admin-consultation {
+        padding: 20px;
+
+        dl > div {
+          grid-template-columns: 105px minmax(0, 1fr);
+        }
+      }
+    }
   }
 }

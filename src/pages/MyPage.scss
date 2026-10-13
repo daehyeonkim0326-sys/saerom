@@ -166,6 +166,7 @@
     padding: 0 12px;
     border: 1px solid #d9d7e8;
     border-radius: 6px;
+    box-sizing: border-box;
     color: #24283a;
     font: inherit;
     font-size: 14px;
@@ -278,6 +279,16 @@
 
     button {
       min-height: 42px;
+    }
+  }
+
+  @media (min-width: 601px) and (max-width: 900px) {
+    .my-page {
+      padding: 44px 24px 68px;
+    }
+
+    .my-page__content {
+      width: min(100%, 680px);
     }
   }
 }

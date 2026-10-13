@@ -183,7 +183,7 @@ const PostDetail = ({ isAdmin }) => {
           padding: '24px 0 60px',
         }}
       >
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 clamp(16px, 4vw, 24px)' }}>
           <div className='detail-toolbar'>
             <button
               type='button'
@@ -229,16 +229,16 @@ const PostDetail = ({ isAdmin }) => {
               alt={post.title}
               style={{
                 width: '100%',
-                height: '560px',
+                height: 'clamp(240px, 46vw, 560px)',
                 objectFit: 'cover',
                 display: 'block',
-                borderRadius: '24px',
+                borderRadius: 'clamp(12px, 3vw, 24px)',
               }}
             />
           )}
 
           <div style={{ paddingTop: '28px', textAlign: 'left' }}>
-            <h1 style={{ margin: '0 0 12px', fontSize: '40px', textAlign: 'left' }}>{post.title}</h1>
+            <h1 style={{ margin: '0 0 12px', fontSize: 'clamp(28px, 5vw, 40px)', textAlign: 'left' }}>{post.title}</h1>
             <p style={{
               margin: 0,
               fontSize: '18px',
@@ -356,6 +356,24 @@ const PostDetail = ({ isAdmin }) => {
         .detail-owner-action--delete:focus-visible {
           background: #fff1f0;
           color: #b42318;
+        }
+
+        @media (max-width: 560px) {
+          .detail-toolbar {
+            gap: 10px;
+            margin-bottom: 14px;
+          }
+
+          .detail-owner-actions {
+            gap: 6px;
+          }
+
+          .detail-owner-action {
+            min-height: 34px;
+            gap: 4px;
+            padding: 0 9px;
+            font-size: 12px;
+          }
         }
 
         .detail-owner-error {
