@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { isSupabaseConfigured, supabase } from '../../lib/supabase.js'
 import './LoginModal.scss'
 
+const authRedirectUrl = new URL(import.meta.env.BASE_URL, window.location.origin).toString()
+
 const socialProviders = [
   { id: 'kakao', label: '카카오로 계속하기', mark: 'K' },
   { id: 'naver', label: '네이버로 계속하기', mark: 'N' },
@@ -70,7 +72,7 @@ const LoginModal = ({ onClose, onAuthenticated, isPasswordRecovery = false }) =>
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { emailRedirectTo: authRedirectUrl },
         })
         if (error) throw error
         if (data.session) {
@@ -114,7 +116,7 @@ const LoginModal = ({ onClose, onAuthenticated, isPasswordRecovery = false }) =>
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: window.location.origin },
+        options: { redirectTo: authRedirectUrl },
       })
       if (error) throw error
     } catch (error) {
@@ -166,7 +168,7 @@ const LoginModal = ({ onClose, onAuthenticated, isPasswordRecovery = false }) =>
     setIsSubmitting(true)
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, {
-        redirectTo: window.location.origin,
+        redirectTo: authRedirectUrl,
       })
       if (error) throw error
       setNotice('계정이 등록된 이메일이라면 비밀번호 재설정 링크를 보냈습니다. 이메일을 확인해 주세요.')
