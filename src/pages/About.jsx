@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Header from '../component/common/Header.jsx'
 import Footer from '../component/common/Footer.jsx'
 import './About.scss'
-import img1 from '../assets/img/about.jpg'
+import img1 from '../assets/img/about.JPG'
 const ScrollReveal = ({ as: Tag = 'p', className = '', delay = 0, children, ...props }) => {
   return (
     <Tag

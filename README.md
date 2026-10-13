@@ -44,12 +44,12 @@ Run these commands from the project directory after `supabase login` and `supaba
 
 ## GitHub Pages Deployment
 
-The workflow at `.github/workflows/deploy-pages.yml` builds and deploys the site whenever code is pushed to `main`. It supports project-site paths, uses `404.html` for React Router deep links, and expects these repository Actions secrets:
+The workflow at `.github/workflows/deploy-pages.yml` builds the site and publishes the generated files to the `gh-pages` branch whenever code is pushed to `main`. It supports project-site paths, uses `404.html` for React Router deep links, and expects these repository Actions secrets:
 
 - `VITE_SUPABASE_URL`: Supabase project URL.
 - `VITE_SUPABASE_PUBLISHABLE_KEY`: Supabase publishable/anon key. Never use a service-role key here.
 
-Push the project to a GitHub repository, add the two secrets under **Settings → Secrets and variables → Actions**, then set **Settings → Pages → Build and deployment → Source** to **GitHub Actions**. The deployment URL appears in the workflow run and Pages settings.
+Push the project to a GitHub repository and add the two secrets under **Settings → Secrets and variables → Actions**. After the first successful workflow run creates the `gh-pages` branch, open **Settings → Pages → Build and deployment** and select **Deploy from a branch**, branch **`gh-pages`**, folder **`/(root)`**. The site URL appears on the Pages settings page; for this repository it follows `https://<owner>.github.io/saerom/`.
 
 After the first deployment, add the Pages URL to Supabase **Authentication → URL Configuration → Site URL and Redirect URLs**. For administrator invitations, update the Supabase `APP_SITE_URL` secret to that same URL and redeploy `invite-admin`. Supabase migrations and Edge Functions are deployed separately from the static site.
 
