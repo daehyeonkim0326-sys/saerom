@@ -39,11 +39,13 @@ jobs:
 
       - name: Publish gh-pages branch
         run: |
+          cp -R dist /tmp/saerom-pages
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch --orphan gh-pages
           git rm -rf --ignore-unmatch .
-          cp -R dist/. .
+          git clean -fdx
+          cp -R /tmp/saerom-pages/. .
           touch .nojekyll
           git add -A
           git commit -m "Deploy ${GITHUB_SHA} to GitHub Pages"
