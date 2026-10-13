@@ -1,0 +1,28 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #f3f4f6;
+  color: #111111;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+}
+
+@keyframes page-float-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes page-float-down {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+}/*# sourceMappingURL=App.css.map */

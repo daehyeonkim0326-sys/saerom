@@ -1,0 +1,202 @@
+.about-page {
+  color: #f0f5e3;
+  animation: page-float-up 0.45s ease-out both;
+}
+.about-page__hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: 2rem;
+  text-shadow: #515151 0 2px 2px;
+  display: flex;
+  width: 100%;
+  aspect-ratio: 3361/4481;
+  min-height: 430px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 24px;
+  text-align: center;
+  box-sizing: border-box;
+}
+.about-page__hero::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 var(--hero-image-inset, 400px);
+  background: url("../assets/img/about.JPG") center top/cover no-repeat;
+  content: "";
+  border-radius: 3rem;
+  filter: blur(var(--hero-blur, 0px));
+  transform: scale(var(--hero-zoom, 1));
+  transform-origin: center top;
+  will-change: filter, transform;
+  transition: inset 180ms linear, filter 180ms linear, transform 180ms linear;
+}
+.about-page__scroll-reveal {
+  opacity: 0;
+  transform: translateY(42px);
+  transition: opacity 650ms ease, transform 650ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.about-page__scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.about-page__hero-title {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.28em;
+  max-width: 100%;
+}
+.about-page__hero-title .about-page__scroll-reveal {
+  display: inline-block;
+  margin: 0;
+  font-size: clamp(26px, 4.1vw, 58px);
+  line-height: 1.25;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+}
+.about-page__eyebrow {
+  margin: 0;
+  color: #838f00;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+.about-page__highlight--yellow {
+  color: #838f00;
+}
+.about-page__highlight--blue {
+  color: #90caf9;
+}
+.about-page__intro {
+  max-width: 600px;
+  margin: 0;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.8;
+}
+.about-page__story {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 100px 24px;
+}
+.about-page__story h2 {
+  margin: 14px 0 0;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.35;
+  letter-spacing: -0.04em;
+}
+.about-page__story-copy {
+  align-self: center;
+  color: #68678a;
+  font-size: 15px;
+  line-height: 1.9;
+}
+.about-page__story-copy p {
+  margin: 0 0 14px;
+}
+.about-page__values {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 24px 100px;
+  color: #070461;
+}
+.about-page__values article {
+  min-height: 190px;
+  padding: 26px;
+  border: 1px solid #e4e2f5;
+  border-radius: 12px;
+  background: #fff;
+  box-sizing: border-box;
+}
+.about-page__values span {
+  color: #847fe0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+.about-page__values h2 {
+  margin: 18px 0 8px;
+  font-size: 20px;
+}
+.about-page__values p {
+  margin: 0;
+  color: #68678a;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.about-page__contact {
+  padding: 68px 24px;
+  background: #29238f;
+  color: #fff;
+  text-align: center;
+}
+.about-page__contact .about-page__eyebrow {
+  color: #fdd400;
+}
+.about-page__contact h2 {
+  margin: 12px 0 24px;
+  font-size: clamp(24px, 4vw, 36px);
+  letter-spacing: -0.04em;
+}
+.about-page__contact a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  border-radius: 6px;
+  background: #fdd400;
+  color: #29238f;
+  font-size: 14px;
+  font-weight: 750;
+  text-decoration: none;
+  transition: background 160ms ease;
+}
+.about-page__contact a:hover {
+  background: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-page__scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .about-page__hero::before {
+    transition: none;
+    will-change: auto;
+  }
+}
+@media (max-width: 680px) {
+  .about-page__hero {
+    min-height: 360px;
+    padding: 2rem 22px;
+  }
+  .about-page__intro {
+    font-size: 14px;
+  }
+  .about-page__hero-title .about-page__scroll-reveal {
+    font-size: clamp(30px, 8vw, 42px);
+  }
+  .about-page__story {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 68px 24px;
+  }
+  .about-page__values {
+    grid-template-columns: 1fr;
+    padding-bottom: 68px;
+  }
+  .about-page__values article {
+    min-height: auto;
+  }
+}/*# sourceMappingURL=About.css.map */
