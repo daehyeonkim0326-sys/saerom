@@ -42,13 +42,13 @@ Run these commands from the project directory after `supabase login` and `supaba
 
 ## Account Withdrawal
 
-Run `supabase/migrations/20261015000000_account_deletion.sql` and `supabase/migrations/20261015010000_admin_withdrawal_guard.sql` in the Supabase SQL Editor, in order, then deploy the Edge Function:
+Account withdrawal is temporarily disabled while data deletion behavior is investigated. Do not deploy a destructive account-deletion implementation. The existing migration currently cascades account deletion to all posts authored by that Supabase user ID.
 
 ```sh
 supabase functions deploy delete-account
 ```
 
-The function uses Supabase's server-provided `SUPABASE_SERVICE_ROLE_KEY`; never add this key to the frontend or commit it. Members can permanently delete their own account from My Page. Administrators must first revoke their own admin role from the Admin Account Management section; deletion is blocked until that role is removed. Community posts are deleted by the existing `auth.users` cascade, and the function also removes the member's post images from storage.
+The deployed function currently returns an error without deleting accounts or posts. Do not remove the database cascade unless a data-retention policy is agreed and tested. To re-enable withdrawal later, first replace the destructive account-to-post cascade with an explicitly approved retention behavior and validate it against the production data model.
 
 ## GitHub Pages Deployment
 
