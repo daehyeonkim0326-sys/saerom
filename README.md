@@ -42,13 +42,13 @@ Run these commands from the project directory after `supabase login` and `supaba
 
 ## Account Withdrawal
 
-Account withdrawal is temporarily disabled while data deletion behavior is investigated. Do not deploy a destructive account-deletion implementation. The existing migration currently cascades account deletion to all posts authored by that Supabase user ID.
+Account withdrawal deletes only the signed-in Supabase Auth account. Community posts and their images are retained; the post's `author_id` is set to `null` so the deleted account cannot be identified or manage the post. Administrators must revoke their own admin role before withdrawing.
 
 ```sh
 supabase functions deploy delete-account
 ```
 
-The deployed function currently returns an error without deleting accounts or posts. Do not remove the database cascade unless a data-retention policy is agreed and tested. To re-enable withdrawal later, first replace the destructive account-to-post cascade with an explicitly approved retention behavior and validate it against the production data model.
+Apply `supabase/migrations/20261015020000_preserve_posts_on_account_deletion.sql` to the production database before deploying the function. The function uses Supabase's server-provided `SUPABASE_SERVICE_ROLE_KEY`; never add this key to the frontend or commit it.
 
 ## GitHub Pages Deployment
 
