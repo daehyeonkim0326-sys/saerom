@@ -6,7 +6,6 @@ const authRedirectUrl = new URL(import.meta.env.BASE_URL, window.location.origin
 
 const socialProviders = [
   { id: 'kakao', label: '카카오로 계속하기', mark: 'K' },
-  { id: 'naver', label: '네이버로 계속하기', mark: 'N' },
   { id: 'google', label: 'Google로 계속하기', mark: 'G' },
 ]
 
@@ -102,10 +101,6 @@ const LoginModal = ({ onClose, onAuthenticated, isPasswordRecovery = false }) =>
     setNotice('')
     setHasAuthError(false)
 
-    if (provider === 'naver') {
-      setNotice('현재 인증 서버에서는 Naver 로그인을 지원하지 않습니다. Google 또는 Kakao를 이용해 주세요.')
-      return
-    }
     if (!isSupabaseConfigured) {
       setHasAuthError(true)
       setNotice('인증 서버 설정이 필요합니다. .env에 Supabase 프로젝트 정보를 입력해 주세요.')

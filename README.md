@@ -11,8 +11,6 @@
 
 After four incorrect email/password login attempts, the login dialog offers account ID guidance and password recovery. The account ID is the signup email; the app does not expose registered email addresses. Password recovery emails let the account owner set a new password after returning to the app.
 
-The Naver button is retained in the UI, but Naver OAuth is not currently available as a built-in Supabase provider. It requires a separate OAuth backend/provider integration before it can authenticate users.
-
 To allow the operator account to publish administrator-only categories, set that user's `app_metadata.role` to `admin` through a trusted Supabase admin workflow. The server-managed claim is enforced by database policies (RLS).
 
 ## Public Admin Answers
@@ -41,6 +39,16 @@ supabase functions deploy invite-admin
 ```
 
 Run these commands from the project directory after `supabase login` and `supabase link --project-ref <your-project-ref>`. The invitation action cannot work until the function is deployed to the same Supabase project configured by `VITE_SUPABASE_URL`. The function uses Supabase's server-provided `SUPABASE_SERVICE_ROLE_KEY`; never add this key to the frontend or commit it. Admins can invite a new email from My Page, or grant administrator access directly to an existing member by email; both receive `app_metadata.role = 'admin'`. Admins can also remove their own admin role from My Page; the database function prevents the last remaining admin from doing so. This keeps the account but removes administrator access.
+
+## Account Withdrawal
+
+Run `supabase/migrations/20261015000000_account_deletion.sql` and `supabase/migrations/20261015010000_admin_withdrawal_guard.sql` in the Supabase SQL Editor, in order, then deploy the Edge Function:
+
+```sh
+supabase functions deploy delete-account
+```
+
+The function uses Supabase's server-provided `SUPABASE_SERVICE_ROLE_KEY`; never add this key to the frontend or commit it. Members can permanently delete their own account from My Page. Administrators must first revoke their own admin role from the Admin Account Management section; deletion is blocked until that role is removed. Community posts are deleted by the existing `auth.users` cascade, and the function also removes the member's post images from storage.
 
 ## GitHub Pages Deployment
 

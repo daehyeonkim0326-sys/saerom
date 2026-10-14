@@ -131,6 +131,47 @@
   }
 }
 
+.my-page__danger-zone {
+  margin-top: 34px;
+  padding: 24px;
+  border: 1px solid #f0c8c5;
+  border-radius: 10px;
+  background: #fff;
+
+  .my-page__section-heading {
+    margin-bottom: 12px;
+  }
+
+  > p {
+    margin: 0 0 16px;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  button {
+    min-height: 40px;
+    padding: 0 15px;
+    border: 1px solid #b42318;
+    border-radius: 6px;
+    background: #fff;
+    color: #b42318;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+  }
+
+  .my-page__admin-error {
+    margin-bottom: 0;
+  }
+}
+
 .my-page__admin-tools {
   margin-top: 34px;
   padding: 24px;
@@ -270,6 +311,10 @@
   }
 
   .my-page__admin-tools {
+    padding: 18px;
+  }
+
+  .my-page__danger-zone {
     padding: 18px;
   }
 

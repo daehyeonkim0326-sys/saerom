@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import './MyPage.scss'
 
@@ -11,12 +11,15 @@ const providerLabels = {
 }
 
 const MyPage = ({ isLoggedIn, isAdmin, onToggleLogin }) => {
+  const navigate = useNavigate()
   const [user, setUser] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [adminInviteEmail, setAdminInviteEmail] = useState('')
   const [adminActionMessage, setAdminActionMessage] = useState('')
   const [adminActionError, setAdminActionError] = useState('')
   const [isAdminActionPending, setIsAdminActionPending] = useState(false)
+  const [accountActionError, setAccountActionError] = useState('')
+  const [isAccountActionPending, setIsAccountActionPending] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -103,6 +106,51 @@ const MyPage = ({ isLoggedIn, isAdmin, onToggleLogin }) => {
     }
   }
 
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      '회원 탈퇴 시 계정이 영구 삭제되고, 작성한 게시물도 함께 삭제됩니다. 이 작업은 되돌릴 수 없습니다. 탈퇴하시겠습니까?',
+    )
+    if (!confirmed) return
+
+    setAccountActionError('')
+    setIsAccountActionPending(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-account', {
+        body: {},
+      })
+      if (error) {
+        let errorMessage = error.message || '회원 탈퇴를 완료하지 못했습니다.'
+        if (error.context instanceof Response) {
+          try {
+            const response = await error.context.clone().json()
+            if (typeof response?.error === 'string') errorMessage = response.error
+          } catch (responseError) {
+            console.error('탈퇴 오류 응답을 읽지 못했습니다.', responseError)
+          }
+        }
+        throw new Error(errorMessage)
+      }
+      if (data?.error) throw new Error(data.error)
+      if (data?.message && data.message !== '회원 탈퇴가 완료되었습니다.') {
+        window.alert(data.message)
+      }
+
+      const { error: signOutError } = await supabase.auth.signOut({ scope: 'local' })
+      if (signOutError) {
+        console.error('탈퇴 후 로그아웃을 마무리하지 못했습니다.', signOutError)
+        setAccountActionError('탈퇴는 완료되었지만 로그아웃을 마무리하지 못했습니다. 페이지를 새로고침해 주세요.')
+        return
+      }
+
+      navigate('/')
+    } catch (error) {
+      console.error('회원 탈퇴를 완료하지 못했습니다.', error)
+      setAccountActionError(error?.message || '회원 탈퇴를 완료하지 못했습니다. 잠시 후 다시 시도해 주세요.')
+    } finally {
+      setIsAccountActionPending(false)
+    }
+  }
+
   if (!isLoggedIn) {
     return (
       <main className='my-page'>
@@ -163,6 +211,28 @@ const MyPage = ({ isLoggedIn, isAdmin, onToggleLogin }) => {
           {isAdmin && <Link to='/admin/consultations'>상담 신청 관리</Link>}
           <button type='button' onClick={onToggleLogin}>로그아웃</button>
         </div>
+
+        <section className='my-page__danger-zone' aria-labelledby='my-page-withdraw-title'>
+          <div className='my-page__section-heading'>
+            <div>
+              <p>ACCOUNT</p>
+              <h2 id='my-page-withdraw-title'>회원 탈퇴</h2>
+            </div>
+          </div>
+          <p>
+            {isAdmin
+              ? '관리자 권한을 먼저 해제해야 탈퇴할 수 있습니다. 아래 관리자 계정 관리에서 권한을 해제해 주세요.'
+              : '탈퇴하면 계정과 작성한 게시물이 영구 삭제되며, 다시 복구할 수 없습니다.'}
+          </p>
+          <button
+            type='button'
+            onClick={handleDeleteAccount}
+            disabled={isAdmin || isAccountActionPending}
+          >
+            {isAccountActionPending ? '탈퇴 처리 중...' : '회원 탈퇴'}
+          </button>
+          {accountActionError && <p className='my-page__admin-error' role='alert'>{accountActionError}</p>}
+        </section>
 
         {isAdmin && (
           <section className='my-page__admin-tools' aria-labelledby='my-page-admin-title'>
