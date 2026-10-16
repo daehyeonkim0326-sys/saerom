@@ -144,9 +144,21 @@ const About = ({ isLoggedIn, onToggleLogin }) => {
       <section className='about-page__contact'>
         <ScrollReveal className='about-page__eyebrow'>LET'S TALK</ScrollReveal>
         <ScrollReveal as='h2' delay={120}>새로운 공간을 함께 이야기해요.</ScrollReveal>
-        <ScrollReveal as={Link} className='about-page__scroll-link' delay={240} to='/consultation'>
-          상담 신청하기
-        </ScrollReveal>
+        <div className='about-page__contact-actions'>
+          <ScrollReveal as={Link} className='about-page__scroll-link' delay={240} to='/consultation'>
+            상담 신청하기
+          </ScrollReveal>
+          <ScrollReveal
+            as='a'
+            className='about-page__scroll-link'
+            delay={320}
+            href='https://map.naver.com/p/search/강원특별자치도%20원주시%20늘품로%20126%20단구동'
+            target='_blank'
+            rel='noreferrer'
+          >
+            오시는 길
+          </ScrollReveal>
+        </div>
       </section>
       </main>
       <Footer />

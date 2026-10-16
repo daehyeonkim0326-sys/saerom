@@ -1,6 +1,6 @@
 import './App.scss'
-import { useEffect, useState } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useEffect, useLayoutEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import Header from './component/common/Header.jsx'
 import { Layout } from './layout/Layout.jsx'
 import PostDetail from './pages/PostDetail.jsx'
@@ -13,6 +13,16 @@ import ConsultationRequest from './pages/ConsultationRequest.jsx'
 import AdminConsultations from './pages/AdminConsultations.jsx'
 import LoginModal from './component/common/LoginModal.jsx'
 import { supabase } from './lib/supabase.js'
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation()
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  return null
+}
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -59,6 +69,7 @@ function App() {
 
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <ScrollToTop />
       <Routes>
         <Route
           path="/"

@@ -217,6 +217,13 @@
       letter-spacing: -0.04em;
     }
 
+    &-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
     a {
       display: inline-flex;
       min-height: 44px;
