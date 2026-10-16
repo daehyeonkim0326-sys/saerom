@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
 import { ArrowLeft, House, Pencil, Send, Trash2 } from 'lucide-react'
-import { deletePostImage, fetchPost, removePost } from '../data/posts'
+import { deletePostImages, fetchPost, removePost } from '../data/posts'
 import { supabase } from '../lib/supabase.js'
 
 const PostDetail = ({ isAdmin }) => {
@@ -124,11 +124,11 @@ const PostDetail = ({ isAdmin }) => {
 
     try {
       await removePost(id)
-      if (post.imagePath) {
+      if (post.imagePaths?.length) {
         try {
-          await deletePostImage(post.imagePath)
+          await deletePostImages(post.imagePaths)
         } catch (imageError) {
-          console.error('게시물 이미지를 삭제하지 못했습니다.', imageError)
+          console.error('게시물 사진을 삭제하지 못했습니다.', imageError)
         }
       }
     } catch (deleteError) {
@@ -223,18 +223,12 @@ const PostDetail = ({ isAdmin }) => {
           </div>
           {ownerActionError && <p className='detail-owner-error' role='alert'>{ownerActionError}</p>}
 
-          {post.image && (
-            <img
-              src={post.image}
-              alt={post.title}
-              style={{
-                width: '100%',
-                height: 'clamp(240px, 46vw, 560px)',
-                objectFit: 'cover',
-                display: 'block',
-                borderRadius: 'clamp(12px, 3vw, 24px)',
-              }}
-            />
+          {post.images?.length > 0 && (
+            <div className='post-detail__images'>
+              {post.images.map((image, index) => (
+                <img key={post.imagePaths[index]} src={image} alt={`${post.title} 사진 ${index + 1}`} />
+              ))}
+            </div>
           )}
 
           <div style={{ paddingTop: '28px', textAlign: 'left' }}>
@@ -299,6 +293,22 @@ const PostDetail = ({ isAdmin }) => {
           justify-content: space-between;
           gap: 16px;
           margin-bottom: 20px;
+        }
+
+        .post-detail__images {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+          gap: 16px;
+        }
+
+        .post-detail__images img {
+          display: block;
+          width: 100%;
+          max-height: 640px;
+          aspect-ratio: 4 / 3;
+          object-fit: contain;
+          border-radius: clamp(12px, 3vw, 24px);
+          background: #f3f4f6;
         }
 
         .detail-back-button {

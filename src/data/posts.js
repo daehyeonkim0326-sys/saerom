@@ -4,19 +4,28 @@ export const POST_CATEGORIES = ['Portfolio', '새롬 이야기', '후기', '공�
 export const ADMIN_ONLY_CATEGORIES = ['Portfolio', '공지']
 export const POST_IMAGE_BUCKET = 'community-post-images'
 
-const mapPost = (post) => ({
-  id: post.id,
-  title: post.title,
-  description: post.description,
-  category: post.category,
-  authorId: post.author_id,
-  authorRole: post.author_role,
-  imagePath: post.image_path,
-  image: post.image_path
-    ? supabase.storage.from(POST_IMAGE_BUCKET).getPublicUrl(post.image_path).data.publicUrl
-    : '',
-  createdAt: post.created_at,
-})
+const mapPost = (post) => {
+  const imagePaths = post.image_paths?.length
+    ? post.image_paths
+    : post.image_path ? [post.image_path] : []
+  const images = imagePaths.map((path) =>
+    supabase.storage.from(POST_IMAGE_BUCKET).getPublicUrl(path).data.publicUrl,
+  )
+
+  return {
+    id: post.id,
+    title: post.title,
+    description: post.description,
+    category: post.category,
+    authorId: post.author_id,
+    authorRole: post.author_role,
+    imagePaths,
+    images,
+    imagePath: imagePaths[0] ?? null,
+    image: images[0] ?? '',
+    createdAt: post.created_at,
+  }
+}
 
 export const fetchPosts = async ({ category, authorId, categories, featuredOnly = false } = {}) => {
   if (!supabase) throw new Error('Supabase is not configured.')
@@ -56,8 +65,13 @@ export const uploadPostImage = async (file, userId) => {
 }
 
 export const deletePostImage = async (path) => {
-  if (!supabase || !path) return
-  const { error } = await supabase.storage.from(POST_IMAGE_BUCKET).remove([path])
+  if (!path) return
+  return deletePostImages([path])
+}
+
+export const deletePostImages = async (paths) => {
+  if (!supabase || !paths?.length) return
+  const { error } = await supabase.storage.from(POST_IMAGE_BUCKET).remove(paths)
   if (error) throw error
 }
 

@@ -5,7 +5,7 @@ import './WritePost.scss'
 import {
   ADMIN_ONLY_CATEGORIES,
   createPost,
-  deletePostImage,
+  deletePostImages,
   fetchPost,
   POST_CATEGORIES,
   updatePost,
@@ -28,16 +28,13 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
     category: availableCategories.includes(location.state?.category)
       ? location.state.category
       : isAdmin ? POST_CATEGORIES[0] : '새롬 이야기',
-    image: '',
-    imagePath: null,
+    images: [],
   }))
-  const [imageFile, setImageFile] = useState(null)
   const [editState, setEditState] = useState({ loading: isEditing, authorized: !isEditing })
   const [submitError, setSubmitError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isImageUploading, setIsImageUploading] = useState(false)
-  const imageInputRef = useRef(null)
-  const originalImagePathRef = useRef(null)
+  const originalImagePathsRef = useRef([])
 
   useEffect(() => {
     if (!isEditing) return undefined
@@ -69,14 +66,19 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
         return
       }
 
+      const imagePaths = post.imagePaths ?? (post.imagePath ? [post.imagePath] : [])
       setForm({
         title: post.title,
         description: post.description,
         category: post.category,
-        image: post.image,
-        imagePath: post.imagePath,
+        images: imagePaths.map((path, index) => ({
+          id: `${path}-${index}`,
+          path,
+          file: null,
+          preview: post.images[index],
+        })),
       })
-      originalImagePathRef.current = post.imagePath
+      originalImagePathsRef.current = imagePaths
       setEditState({ loading: false, authorized: true })
     }
 
@@ -87,24 +89,43 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
   }, [isEditing, isLoggedIn, isAdmin, postId])
 
   const handleImageUpload = (event) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+    const selectedFiles = Array.from(event.target.files ?? [])
+    if (!selectedFiles.length) return
 
-    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type) || file.size > 10 * 1024 * 1024) {
-      setSubmitError('사진은 JPG, PNG, WEBP, GIF 파일만 가능하며 10MB 이하여야 합니다.')
+    if (form.images.length + selectedFiles.length > 10) {
+      setSubmitError('게시물 사진은 최대 10장까지 첨부할 수 있습니다.')
+      event.target.value = ''
+      return
+    }
+
+    const invalidFile = selectedFiles.find((file) =>
+      !['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)
+      || file.size > 10 * 1024 * 1024,
+    )
+    if (invalidFile) {
+      setSubmitError('사진은 JPG, PNG, WEBP, GIF 파일만 가능하며 각각 10MB 이하여야 합니다.')
       event.target.value = ''
       return
     }
 
     setSubmitError('')
-    setImageFile(file)
-    setForm((current) => ({ ...current, image: URL.createObjectURL(file) }))
+    const newImages = selectedFiles.map((file) => ({
+      id: crypto.randomUUID(),
+      path: null,
+      file,
+      preview: URL.createObjectURL(file),
+    }))
+    setForm((current) => ({ ...current, images: [...current.images, ...newImages] }))
+    event.target.value = ''
   }
 
-  const handleRemoveImage = () => {
-    setImageFile(null)
-    setForm((current) => ({ ...current, image: '', imagePath: null }))
-    if (imageInputRef.current) imageInputRef.current.value = ''
+  const handleRemoveImage = (imageId) => {
+    const removedImage = form.images.find((image) => image.id === imageId)
+    if (removedImage?.file) URL.revokeObjectURL(removedImage.preview)
+    setForm((current) => ({
+      ...current,
+      images: current.images.filter((image) => image.id !== imageId),
+    }))
   }
 
   const handleSubmit = async (event) => {
@@ -119,7 +140,7 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
       return
     }
     setIsSubmitting(true)
-    let uploadedImagePath = null
+    const uploadedImagePaths = []
     let imageUploadFailed = false
     try {
       const { data: { user }, error } = await supabase.auth.getUser()
@@ -138,36 +159,44 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
         imageOwnerId = existingPost.authorId
       }
 
-      let imagePath = form.imagePath
-      if (imageFile) {
+      const savedImages = []
+      const pendingImages = form.images.filter((image) => image.file)
+      if (pendingImages.length) {
         imageUploadFailed = true
         setIsImageUploading(true)
         try {
-          imagePath = await uploadPostImage(imageFile, imageOwnerId)
-          uploadedImagePath = imagePath
+          for (const image of pendingImages) {
+            const path = await uploadPostImage(image.file, imageOwnerId)
+            uploadedImagePaths.push(path)
+            savedImages.push([image.id, path])
+          }
           imageUploadFailed = false
         } finally {
           setIsImageUploading(false)
         }
       }
+      const uploadedPathsById = new Map(savedImages)
+      const imagePaths = form.images.map((image) => image.path ?? uploadedPathsById.get(image.id))
 
       const postData = {
         title: form.title.trim(),
         description: form.description,
         category: form.category,
-        image_path: imagePath,
+        image_path: imagePaths[0] ?? null,
+        image_paths: imagePaths,
       }
 
       if (isEditing) {
         await updatePost(postId, postData)
-        if (originalImagePathRef.current && originalImagePathRef.current !== imagePath) {
+        const removedImagePaths = originalImagePathsRef.current.filter((path) => !imagePaths.includes(path))
+        if (removedImagePaths.length) {
           try {
-            await deletePostImage(originalImagePathRef.current)
+            await deletePostImages(removedImagePaths)
           } catch (imageError) {
-            console.error('기존 게시물 이미지를 삭제하지 못했습니다.', imageError)
+            console.error('기존 게시물 사진을 삭제하지 못했습니다.', imageError)
           }
         }
-        originalImagePathRef.current = imagePath
+        originalImagePathsRef.current = imagePaths
         navigate(returnPath)
       } else {
         const newPost = await createPost({
@@ -181,11 +210,11 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
       }
     } catch (error) {
       console.error('게시물을 저장하지 못했습니다.', error)
-      if (uploadedImagePath) {
+      if (uploadedImagePaths.length) {
         try {
-          await deletePostImage(uploadedImagePath)
+          await deletePostImages(uploadedImagePaths)
         } catch (cleanupError) {
-          console.error('게시물 저장 실패 후 이미지를 정리하지 못했습니다.', cleanupError)
+          console.error('게시물 저장 실패 후 사진을 정리하지 못했습니다.', cleanupError)
         }
       }
       if (imageUploadFailed) {
@@ -287,26 +316,31 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
         </label>
 
         <label>
-          <span>{isEditing ? '사진 변경' : '사진 첨부'}</span>
+          <span>사진 첨부 (최대 10장)</span>
           <input
-            ref={imageInputRef}
             type='file'
+            multiple
             accept='.jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif'
             onChange={handleImageUpload}
           />
         </label>
 
-        {form.image && (
-          <div className='write-form__image-preview'>
-            <img className='write-form__preview' src={form.image} alt='게시물 이미지 미리보기' />
-            <button
-              className='write-form__image-remove'
-              type='button'
-              onClick={handleRemoveImage}
-            >
-              <Trash2 size={15} aria-hidden='true' />
-              사진 제거
-            </button>
+        {form.images.length > 0 && (
+          <div className='write-form__image-grid'>
+            {form.images.map((image, index) => (
+              <div className='write-form__image-preview' key={image.id}>
+                <img className='write-form__preview' src={image.preview} alt={`게시물 사진 ${index + 1} 미리보기`} />
+                <button
+                  className='write-form__image-remove'
+                  type='button'
+                  aria-label={`${index + 1}번 사진 제거`}
+                  onClick={() => handleRemoveImage(image.id)}
+                >
+                  <Trash2 size={15} aria-hidden='true' />
+                  사진 제거
+                </button>
+              </div>
+            ))}
           </div>
         )}
 

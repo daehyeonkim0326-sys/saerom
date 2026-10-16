@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Pencil, Trash2 } from 'lucide-react'
-import { deletePostImage, fetchPosts, removePost } from '../data/posts'
+import { deletePostImages, fetchPosts, removePost } from '../data/posts'
 import { supabase } from '../lib/supabase.js'
 import './MyPosts.scss'
 
@@ -20,11 +20,11 @@ const MyPosts = ({ isLoggedIn }) => {
       }
 
       await removePost(post.id)
-      if (post.imagePath) {
+      if (post.imagePaths?.length) {
         try {
-          await deletePostImage(post.imagePath)
+          await deletePostImages(post.imagePaths)
         } catch (imageError) {
-          console.error('게시물 이미지를 삭제하지 못했습니다.', imageError)
+          console.error('게시물 사진을 삭제하지 못했습니다.', imageError)
         }
       }
       setPosts((currentPosts) => currentPosts.filter((item) => item.id !== post.id))
