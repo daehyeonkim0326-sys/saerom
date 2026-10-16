@@ -135,6 +135,18 @@
       color: #1a3ac6;
       transform: translateY(-1px);
     }
+
+    &:disabled {
+      cursor: wait;
+      opacity: 0.65;
+      transform: none;
+    }
+  }
+
+  &__progress {
+    margin: -10px 0 0;
+    color: #4b5563;
+    font-size: 14px;
   }
 }
 

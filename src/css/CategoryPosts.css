@@ -22,6 +22,12 @@
   color: #111827;
   font-size: 32px;
 }
+.category-page__heading span {
+  display: block;
+  margin-top: 10px;
+  color: #6b7280;
+  font-size: 14px;
+}
 .category-page__write {
   display: inline-flex;
   min-height: 42px;
@@ -109,5 +115,13 @@
   }
   .category-page__heading {
     align-items: flex-start;
+  }
+}
+@media (max-width: 600px) and (min-width: 601px) and (max-width: 900px) {
+  .category-page {
+    padding: 40px 24px 64px;
+  }
+  .category-grid {
+    gap: 16px;
   }
 }/*# sourceMappingURL=CategoryPosts.css.map */

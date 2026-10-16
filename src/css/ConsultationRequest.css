@@ -1,0 +1,380 @@
+.consultation-page {
+  min-height: calc(100vh - 85px);
+  padding: 56px max(20px, (100% - 920px) / 2) 88px;
+  background: #f3f4f6;
+  color: #29238f;
+  animation: page-float-up 0.45s ease-out both;
+  box-sizing: border-box;
+}
+.consultation-page__heading {
+  margin-bottom: 30px;
+  text-align: center;
+}
+.consultation-page__heading p {
+  margin: 0 0 10px;
+  color: #625bd2;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+.consultation-page__heading h1 {
+  margin: 0 0 10px;
+  font-size: clamp(30px, 5vw, 42px);
+  letter-spacing: -0.04em;
+}
+.consultation-page__heading span {
+  color: #68678a;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.consultation-form {
+  overflow: hidden;
+  border: 1px solid #e4e2f5;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(41, 35, 143, 0.07);
+}
+.consultation-form__section, .consultation-form__privacy {
+  padding: 28px 32px;
+  border-bottom: 1px solid #ecebf5;
+}
+.consultation-form__section h2, .consultation-form__privacy h2 {
+  margin: 0 0 22px;
+  color: #29238f;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+}
+.consultation-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 18px;
+}
+.consultation-form__grid > label,
+.consultation-form__grid fieldset {
+  min-width: 0;
+}
+.consultation-form__grid > label {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  color: #34324f;
+  font-size: 13px;
+  font-weight: 700;
+}
+.consultation-form__grid input:not([type=checkbox]):not([type=file]),
+.consultation-form__grid select,
+.consultation-form__grid textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  border: 1px solid #d9d7e8;
+  border-radius: 6px;
+  outline: none;
+  background: #fff;
+  color: #28263e;
+  font: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.consultation-form__grid input:not([type=checkbox]):not([type=file]):focus,
+.consultation-form__grid select:focus,
+.consultation-form__grid textarea:focus {
+  border-color: #625bd2;
+  box-shadow: 0 0 0 3px rgba(98, 91, 210, 0.12);
+}
+.consultation-form__grid textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.6;
+}
+.consultation-form em {
+  color: #d93025;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
+.consultation-form fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.consultation-form fieldset > label {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #34324f;
+  font-size: 13px;
+  font-weight: 700;
+}
+.consultation-form fieldset legend {
+  margin-bottom: 8px;
+  color: #34324f;
+  font-size: 13px;
+  font-weight: 700;
+}
+.consultation-form fieldset legend span {
+  color: #777694;
+  font-size: 11px;
+  font-weight: 500;
+}
+.consultation-form fieldset input[type=file] {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: 1px dashed #c9c6e2;
+  border-radius: 6px;
+  color: #68678a;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+.consultation-form fieldset small {
+  display: block;
+  margin-top: 7px;
+  color: #777694;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.consultation-form__wide {
+  grid-column: 1/-1;
+}
+.consultation-form__address {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  color: #34324f;
+  font-size: 13px;
+  font-weight: 700;
+}
+.consultation-form__address > input, .consultation-form__address-row input {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  border: 1px solid #d9d7e8;
+  border-radius: 6px;
+  outline: none;
+  background: #fff;
+  color: #28263e;
+  font: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.consultation-form__address > input:focus, .consultation-form__address-row input:focus {
+  border-color: #625bd2;
+  box-shadow: 0 0 0 3px rgba(98, 91, 210, 0.12);
+}
+.consultation-form__address-row {
+  display: flex;
+  gap: 8px;
+}
+.consultation-form__address-row button {
+  flex: 0 0 auto;
+  padding: 0 16px;
+  border: 1px solid #3b34c8;
+  border-radius: 6px;
+  background: #3b34c8;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.consultation-form__hint {
+  margin: 0 0 9px;
+  color: #68678a;
+  font-size: 12px;
+}
+.consultation-form__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.consultation-form__choice {
+  cursor: pointer;
+}
+.consultation-form__choice input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.consultation-form__choice input:focus-visible + span {
+  outline: 3px solid rgba(98, 91, 210, 0.25);
+}
+.consultation-form__choice input:checked + span {
+  border-color: #3b34c8;
+  background: #f2f0ff;
+  color: #29238f;
+}
+.consultation-form__choice span {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  padding: 0 13px;
+  border: 1px solid #dedcf1;
+  border-radius: 999px;
+  color: #68678a;
+  font-size: 12px;
+  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+.consultation-form__privacy {
+  background: #fafaff;
+}
+.consultation-form__privacy h2 {
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+.consultation-form__privacy p {
+  margin: 0 0 15px;
+  color: #68678a;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.consultation-form__privacy label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #34324f;
+  font-size: 13px;
+  font-weight: 700;
+}
+.consultation-form__privacy input {
+  width: 16px;
+  height: 16px;
+  accent-color: #3b34c8;
+}
+.consultation-form__notice {
+  margin: 18px 32px 0;
+  padding: 13px 15px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.consultation-form__notice--success {
+  background: #eef8f0;
+  color: #246b35;
+}
+.consultation-form__notice--error {
+  background: #fff1f0;
+  color: #b42318;
+}
+.consultation-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 22px 32px 28px;
+}
+.consultation-form__actions a,
+.consultation-form__actions button {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 22px;
+  border: 1px solid #dedcf1;
+  border-radius: 6px;
+  background: #fff;
+  color: #3b34c8;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.consultation-form__actions button {
+  border-color: #3b34c8;
+  background: #3b34c8;
+  color: #fff;
+}
+.consultation-form__actions button:hover:not(:disabled) {
+  border-color: #fee500;
+  background: #fee500;
+  color: #29238f;
+}
+.consultation-form__actions button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.consultation-address-modal {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(22, 20, 55, 0.55);
+}
+.consultation-address-modal__content {
+  width: min(500px, 100%);
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(15, 13, 48, 0.25);
+}
+.consultation-address-modal__content header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #ecebf5;
+}
+.consultation-address-modal__content h2 {
+  margin: 0;
+  color: #29238f;
+  font-size: 16px;
+}
+.consultation-address-modal__content button {
+  padding: 6px 10px;
+  border: 1px solid #dedcf1;
+  border-radius: 5px;
+  background: #fff;
+  color: #3b34c8;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.consultation-address-modal__embed {
+  height: min(460px, 65vh);
+}
+.consultation-address-modal__error {
+  margin: 0;
+  padding: 28px 20px;
+  color: #b42318;
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .consultation-page {
+    padding: 36px 14px 56px;
+  }
+  .consultation-form__section, .consultation-form__privacy {
+    padding: 22px 18px;
+  }
+  .consultation-form__grid {
+    grid-template-columns: 1fr;
+    gap: 17px;
+  }
+  .consultation-form__address-row button {
+    padding: 0 12px;
+  }
+  .consultation-form__wide {
+    grid-column: auto;
+  }
+  .consultation-form__notice {
+    margin-right: 18px;
+    margin-left: 18px;
+  }
+  .consultation-form__actions {
+    padding: 18px;
+  }
+  .consultation-form__actions a,
+  .consultation-form__actions button {
+    flex: 1;
+    padding: 0 12px;
+  }
+}/*# sourceMappingURL=ConsultationRequest.css.map */

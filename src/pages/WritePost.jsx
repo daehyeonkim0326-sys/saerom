@@ -34,6 +34,8 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
   const [imageFile, setImageFile] = useState(null)
   const [editState, setEditState] = useState({ loading: isEditing, authorized: !isEditing })
   const [submitError, setSubmitError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isImageUploading, setIsImageUploading] = useState(false)
   const imageInputRef = useRef(null)
   const originalImagePathRef = useRef(null)
 
@@ -116,14 +118,16 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
       setSubmitError('게시물 서버 설정이 필요합니다. 관리자에게 문의해 주세요.')
       return
     }
-    const { data: { user }, error } = await supabase.auth.getUser()
-    if (error || !user) {
-      setSubmitError('로그인 정보를 확인할 수 없습니다. 다시 로그인해 주세요.')
-      return
-    }
-
+    setIsSubmitting(true)
     let uploadedImagePath = null
+    let imageUploadFailed = false
     try {
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error || !user) {
+        setSubmitError('로그인 정보를 확인할 수 없습니다. 다시 로그인해 주세요.')
+        return
+      }
+
       let imageOwnerId = user.id
       if (isEditing) {
         const existingPost = await fetchPost(postId)
@@ -134,10 +138,18 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
         imageOwnerId = existingPost.authorId
       }
 
-      const imagePath = imageFile
-        ? await uploadPostImage(imageFile, imageOwnerId)
-        : form.imagePath
-      if (imageFile) uploadedImagePath = imagePath
+      let imagePath = form.imagePath
+      if (imageFile) {
+        imageUploadFailed = true
+        setIsImageUploading(true)
+        try {
+          imagePath = await uploadPostImage(imageFile, imageOwnerId)
+          uploadedImagePath = imagePath
+          imageUploadFailed = false
+        } finally {
+          setIsImageUploading(false)
+        }
+      }
 
       const postData = {
         title: form.title.trim(),
@@ -176,11 +188,21 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
           console.error('게시물 저장 실패 후 이미지를 정리하지 못했습니다.', cleanupError)
         }
       }
-      setSubmitError(
-        /row-level security|permission denied/i.test(error?.message ?? '')
-          ? '해당 카테고리에 글을 작성할 권한이 없습니다. 로그인과 관리자 설정을 확인해 주세요.'
-          : '게시물을 저장하지 못했습니다. 네트워크와 데이터베이스 설정을 확인한 뒤 다시 시도해 주세요.',
-      )
+      if (imageUploadFailed) {
+        setSubmitError(
+          /row-level security|permission denied/i.test(error?.message ?? '')
+            ? '사진 업로드 권한이 없습니다. Supabase Storage의 community-post-images 버킷 정책을 확인해 주세요.'
+            : '사진을 업로드하지 못했습니다. community-post-images 버킷과 파일 용량 제한을 확인한 뒤 다시 시도해 주세요.',
+        )
+      } else {
+        setSubmitError(
+          /row-level security|permission denied/i.test(error?.message ?? '')
+            ? '해당 카테고리에 글을 작성할 권한이 없습니다. 로그인과 관리자 설정을 확인해 주세요.'
+            : '게시물을 저장하지 못했습니다. 네트워크와 데이터베이스 설정을 확인한 뒤 다시 시도해 주세요.',
+        )
+      }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -214,7 +236,7 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
 
   return (
     <main className='write-page'>
-      <form className='write-form' onSubmit={handleSubmit}>
+      <form className='write-form' onSubmit={handleSubmit} aria-busy={isSubmitting}>
         <div className='write-form__heading'>
           <div>
             <p>{isEditing ? '게시물 관리' : '새 게시물'}</p>
@@ -289,8 +311,15 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
         )}
 
         {submitError && <p className='write-form__error' role='alert'>{submitError}</p>}
-        <button className='write-form__submit' type='submit'>
-          {isEditing ? '수정 완료' : '게시물 등록'}
+        {isSubmitting && (
+          <p className='write-form__progress' role='status'>
+            {isImageUploading ? '사진을 업로드하는 중입니다.' : '게시물을 저장하는 중입니다.'}
+          </p>
+        )}
+        <button className='write-form__submit' type='submit' disabled={isSubmitting}>
+          {isSubmitting
+            ? isImageUploading ? '사진 업로드 중...' : '저장 중...'
+            : isEditing ? '수정 완료' : '게시물 등록'}
         </button>
       </form>
     </main>

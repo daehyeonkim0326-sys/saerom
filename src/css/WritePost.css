@@ -148,4 +148,13 @@
   .write-page__notice {
     padding: 22px 18px;
   }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .write-page {
+    padding: 36px 24px 64px;
+  }
+  .write-form,
+  .write-page__notice {
+    padding: 28px;
+  }
 }/*# sourceMappingURL=WritePost.css.map */

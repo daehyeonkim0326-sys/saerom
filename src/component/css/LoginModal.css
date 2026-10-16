@@ -104,6 +104,14 @@
   border-color: #3b34c8;
   box-shadow: 0 0 0 3px rgba(59, 52, 200, 0.14);
 }
+.login-modal__form--error input {
+  border-color: #d93025;
+  box-shadow: 0 0 0 1px rgba(217, 48, 37, 0.16);
+}
+.login-modal__form--error input:focus {
+  border-color: #d93025;
+  box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.14);
+}
 
 .login-modal__submit {
   min-height: 48px;
@@ -197,6 +205,61 @@
   font-size: 12px;
   line-height: 1.5;
   text-align: center;
+}
+.login-modal__notice[role=alert] {
+  color: #d93025;
+  font-weight: 700;
+}
+
+.login-modal__recovery-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.login-modal__recovery-actions button,
+.login-modal__recovery-actions .login-modal__back {
+  padding: 7px 10px;
+  border: 1px solid #dedcf1;
+  border-radius: 6px;
+  background: #fff;
+  color: #3b34c8;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.login-modal__recovery-actions button:hover,
+.login-modal__recovery-actions .login-modal__back:hover {
+  border-color: #aaa6e4;
+  background: #f8f7ff;
+}
+
+.login-modal__recovery-info {
+  display: grid;
+  gap: 10px;
+  color: #68678a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.login-modal__recovery-info p {
+  margin: 0;
+}
+
+.login-modal__back {
+  min-height: 40px;
+  border: 1px solid #dedcf1;
+  border-radius: 6px;
+  background: #fff;
+  color: #3b34c8;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.login-modal__back:hover {
+  border-color: #aaa6e4;
+  background: #f8f7ff;
 }
 
 .login-modal__switch {

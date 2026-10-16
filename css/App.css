@@ -3,7 +3,7 @@ body {
   padding: 0;
   background: #f3f4f6;
   color: #111111;
-  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  font-family: "Playfair Display", "Pretendard", "Noto Sans KR", sans-serif;
 }
 
 @keyframes page-float-up {

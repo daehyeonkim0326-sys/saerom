@@ -189,6 +189,15 @@
     flex-wrap: wrap;
   }
   .my-posts-page__actions {
-    margin-left: auto;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .my-posts-page {
+    padding: 40px 24px 64px;
+  }
+  .my-posts-page__list {
+    gap: 16px;
   }
 }/*# sourceMappingURL=MyPosts.css.map */
