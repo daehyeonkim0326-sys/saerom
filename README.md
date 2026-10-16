@@ -19,7 +19,16 @@ Run `supabase/migrations/20261001000000_post_answers.sql` in the Supabase SQL Ed
 
 ## Consultation Requests
 
-Run `supabase/migrations/20261013000000_consultation_requests.sql` and then `supabase/migrations/20261013010000_consultation_form_fields.sql` in the Supabase SQL Editor, in order. They create the consultation request table, private floor-plan bucket, RLS policies, and the current form fields. Visitors can submit a request without signing in; only authenticated users whose server-managed `app_metadata.role` is `admin` can read request details and floor plans. The admin request list is available at `/admin/consultations` and from the admin My Page. Floor plans are limited to two PDF/JPG/PNG files, up to 10 MB each.
+Run `supabase/migrations/20261013000000_consultation_requests.sql`, `supabase/migrations/20261013010000_consultation_form_fields.sql`, and `supabase/migrations/20261016010000_consultation_completion_retention.sql` in the Supabase SQL Editor, in order. They create the consultation request table, private floor-plan bucket, RLS policies, current form fields, and the admin-only completion action. Visitors can submit a request without signing in; only authenticated users whose server-managed `app_metadata.role` is `admin` can read request details and floor plans. The admin request list is available at `/admin/consultations` and from the admin My Page. Marking a request complete starts a one-year retention period.
+
+Generate a long random secret, use the same value in Supabase and as the GitHub Actions repository secret, then deploy the cleanup Edge Function:
+
+```sh
+supabase secrets set CONSULTATION_CLEANUP_SECRET='REPLACE_WITH_LONG_RANDOM_SECRET'
+supabase functions deploy cleanup-consultations --no-verify-jwt
+```
+
+Add `CONSULTATION_CLEANUP_SECRET` under the repository's **Settings → Secrets and variables → Actions**. The `Clean up expired consultations` workflow runs daily and removes expired floor-plan files through the Storage API before deleting their request records. Without this Edge Function, secret, and scheduled workflow, completed consultation data will not be automatically deleted.
 
 The migration must be applied to the Supabase project before enabling the consultation form. Keep the bucket private and do not grant public `select` access to either the request table or floor-plan storage.
 

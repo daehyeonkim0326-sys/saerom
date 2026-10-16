@@ -101,6 +101,50 @@
     }
   }
 
+  &__complete {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #ecebf5;
+
+    button {
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 17px;
+      border: 1px solid #3b34c8;
+      border-radius: 6px;
+      background: #3b34c8;
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 160ms ease, color 160ms ease;
+
+      &:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      &:hover:not(:disabled),
+      &:focus-visible:not(:disabled) {
+        border-color: transparent;
+        background: #fee500;
+        color: #29238f;
+      }
+    }
+  }
+
+  &__retention {
+    display: block;
+    margin-top: 6px;
+    color: #25734a;
+    font-size: 12px;
+  }
+
   dl {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

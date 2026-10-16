@@ -1,0 +1,23 @@
+name: Clean up expired consultations
+
+on:
+  schedule:
+    - cron: '17 17 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete expired consultation data
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          CONSULTATION_CLEANUP_SECRET: ${{ secrets.CONSULTATION_CLEANUP_SECRET }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "x-cleanup-secret: ${CONSULTATION_CLEANUP_SECRET}" \
+            "${SUPABASE_URL}/functions/v1/cleanup-consultations"

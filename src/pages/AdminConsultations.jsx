@@ -25,6 +25,8 @@ const AdminConsultations = ({ isLoggedIn, isAdmin, onToggleLogin }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [fileLinks, setFileLinks] = useState({})
+  const [completingRequestId, setCompletingRequestId] = useState(null)
+  const [completionError, setCompletionError] = useState('')
 
   useEffect(() => {
     let isMounted = true
@@ -77,6 +79,51 @@ const AdminConsultations = ({ isLoggedIn, isAdmin, onToggleLogin }) => {
     }
   }, [isAdmin, isLoggedIn])
 
+  const handleCompleteConsultation = async (request) => {
+    const confirmed = window.confirm(
+      '상담을 완료 처리할까요? 완료 처리일로부터 1년 후 상담 내용과 첨부 평면도가 자동 삭제됩니다.',
+    )
+    if (!confirmed) return
+
+    setCompletingRequestId(request.id)
+    setCompletionError('')
+    try {
+      const { data, error } = await supabase.rpc('complete_consultation_request', {
+        request_id: request.id,
+      })
+      if (error) throw error
+
+      const completed = Array.isArray(data) ? data[0] : data
+      if (!completed?.completed_at || !completed?.delete_after) {
+        throw new Error('완료 처리 결과를 확인할 수 없습니다.')
+      }
+
+      setRequests((current) => current.map((item) => (
+        item.id === request.id
+          ? { ...item, completed_at: completed.completed_at, delete_after: completed.delete_after }
+          : item
+      )))
+    } catch (error) {
+      console.error('상담을 완료 처리하지 못했습니다.', error)
+      const errorCode = error?.code ?? ''
+      const errorMessage = error?.message ?? ''
+      const isFunctionMissing = errorCode === 'PGRST202'
+        || /complete_consultation_request.*(not found|schema cache)|could not find the function/i.test(errorMessage)
+      const isPermissionError = errorCode === '42501'
+        || /permission denied|관리자만 상담을 완료/i.test(errorMessage)
+
+      setCompletionError(
+        isFunctionMissing
+          ? '완료 처리 기능이 데이터베이스에 아직 적용되지 않았습니다. 관리자에게 20261016010000_consultation_completion_retention.sql 마이그레이션을 적용해 달라고 요청해 주세요.'
+          : isPermissionError
+            ? '관리자 권한을 확인하지 못했습니다. 관리자 계정으로 다시 로그인한 뒤 시도해 주세요.'
+            : '상담 완료 처리에 실패했습니다. 네트워크와 Supabase 설정을 확인한 뒤 다시 시도해 주세요.',
+      )
+    } finally {
+      setCompletingRequestId(null)
+    }
+  }
+
   return (
     <>
       <Header isLoggedIn={isLoggedIn} onToggleLogin={onToggleLogin} />
@@ -100,6 +147,11 @@ const AdminConsultations = ({ isLoggedIn, isAdmin, onToggleLogin }) => {
               <h1>상담 신청 관리</h1>
               <span>접수된 상담 신청 {requests.length}건</span>
             </header>
+            {completionError && (
+              <p className='admin-consultations__empty admin-consultations__empty--error' role='alert'>
+                {completionError}
+              </p>
+            )}
             {isLoading ? (
               <p className='admin-consultations__empty' role='status'>상담 신청 정보를 불러오는 중입니다.</p>
             ) : errorMessage ? (
@@ -118,6 +170,11 @@ const AdminConsultations = ({ isLoggedIn, isAdmin, onToggleLogin }) => {
                         <time dateTime={request.created_at}>
                           {new Date(request.created_at).toLocaleString('ko-KR')}
                         </time>
+                        {request.completed_at && (
+                          <span className='admin-consultation__retention'>
+                            상담 완료 · {new Date(request.delete_after).toLocaleDateString('ko-KR')} 자동 삭제 예정
+                          </span>
+                        )}
                       </div>
                       <a href={`mailto:${request.email}`}>이메일 보내기</a>
                     </header>
@@ -152,6 +209,17 @@ const AdminConsultations = ({ isLoggedIn, isAdmin, onToggleLogin }) => {
                           ))}
                         </ul>
                       </section>
+                    )}
+                    {!request.completed_at && (
+                      <div className='admin-consultation__complete'>
+                        <button
+                          type='button'
+                          disabled={completingRequestId === request.id}
+                          onClick={() => handleCompleteConsultation(request)}
+                        >
+                          {completingRequestId === request.id ? '처리 중...' : '상담 완료'}
+                        </button>
+                      </div>
                     )}
                   </article>
                 ))}
