@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { PenLine } from 'lucide-react'
+import ImageSlider from '../component/common/ImageSlider'
 import { ADMIN_ONLY_CATEGORIES, fetchPosts, POST_CATEGORIES } from '../data/posts'
 import './CategoryPosts.scss'
 
@@ -65,9 +66,10 @@ const CategoryPosts = ({ isLoggedIn, isAdmin }) => {
               className='category-post'
               to={`/post/${post.id}`}
               state={{ from: location.pathname }}
+              viewTransition
               key={post.id}
             >
-              {post.image && <img src={post.image} alt='' />}
+              {post.images?.length > 0 && <ImageSlider images={post.images} title={post.title} openOnImageClick transitionName={`post-image-${post.id}`} />}
               <div className='category-post__body'>
                 <span>{post.category}</span>
                 <h2>{post.title}</h2>

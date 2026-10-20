@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
 import { ArrowLeft, House, Pencil, Send, Trash2 } from 'lucide-react'
+import ImageSlider from '../component/common/ImageSlider'
 import { deletePostImages, fetchPost, removePost } from '../data/posts'
 import { supabase } from '../lib/supabase.js'
 
@@ -223,13 +224,7 @@ const PostDetail = ({ isAdmin }) => {
           </div>
           {ownerActionError && <p className='detail-owner-error' role='alert'>{ownerActionError}</p>}
 
-          {post.images?.length > 0 && (
-            <div className='post-detail__images'>
-              {post.images.map((image, index) => (
-                <img key={post.imagePaths[index]} src={image} alt={`${post.title} 사진 ${index + 1}`} />
-              ))}
-            </div>
-          )}
+          {post.images?.length > 0 && <div className='post-detail__images'><ImageSlider images={post.images} title={post.title} detail transitionName={`post-image-${post.id}`} /></div>}
 
           <div style={{ paddingTop: '28px', textAlign: 'left' }}>
             <h1 style={{ margin: '0 0 12px', fontSize: 'clamp(28px, 5vw, 40px)', textAlign: 'left' }}>{post.title}</h1>
@@ -296,19 +291,7 @@ const PostDetail = ({ isAdmin }) => {
         }
 
         .post-detail__images {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-          gap: 16px;
-        }
-
-        .post-detail__images img {
-          display: block;
           width: 100%;
-          max-height: 640px;
-          aspect-ratio: 4 / 3;
-          object-fit: contain;
-          border-radius: clamp(12px, 3vw, 24px);
-          background: #f3f4f6;
         }
 
         .detail-back-button {

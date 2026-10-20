@@ -183,6 +183,12 @@
   font-size: clamp(24px, 4vw, 36px);
   letter-spacing: -0.04em;
 }
+.about-page__contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
 .about-page__contact a {
   display: inline-flex;
   min-height: 44px;

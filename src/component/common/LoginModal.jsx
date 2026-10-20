@@ -25,6 +25,7 @@ const getAuthErrorMessage = (error) => {
 
 const LoginModal = ({ onClose, onAuthenticated, isPasswordRecovery = false }) => {
   const [isSignUp, setIsSignUp] = useState(false)
+  const [privacyConsent, setPrivacyConsent] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasLoginError, setHasLoginError] = useState(false)
   const [hasAuthError, setHasAuthError] = useState(false)
@@ -101,6 +102,12 @@ const LoginModal = ({ onClose, onAuthenticated, isPasswordRecovery = false }) =>
     setNotice('')
     setHasAuthError(false)
 
+    if (isSignUp && !privacyConsent) {
+      setHasAuthError(true)
+      setNotice('회원가입을 계속하려면 필수 개인정보 수집·이용에 동의해 주세요.')
+      return
+    }
+
     if (!isSupabaseConfigured) {
       setHasAuthError(true)
       setNotice('인증 서버 설정이 필요합니다. .env에 Supabase 프로젝트 정보를 입력해 주세요.')
@@ -123,6 +130,7 @@ const LoginModal = ({ onClose, onAuthenticated, isPasswordRecovery = false }) =>
 
   const switchMode = () => {
     setIsSignUp((current) => !current)
+    setPrivacyConsent(false)
     setHasLoginError(false)
     setHasAuthError(false)
     setFailedLoginAttempts(0)
@@ -287,6 +295,30 @@ const LoginModal = ({ onClose, onAuthenticated, isPasswordRecovery = false }) =>
                 aria-invalid={hasLoginError || undefined}
                 onChange={clearLoginError}
               />
+
+              {isSignUp && (
+                <section className='login-modal__privacy' aria-labelledby='signup-privacy-title'>
+                  <h3 id='signup-privacy-title'>필수 개인정보 수집·이용 동의</h3>
+                  <p><strong>목적</strong> 회원 가입, 로그인 및 계정 복구</p>
+                  <p><strong>항목</strong> 이메일 주소, 비밀번호(인증 목적)</p>
+                  <p><strong>보유 기간</strong> 회원 탈퇴 시까지. 탈퇴하면 계정은 삭제됩니다.</p>
+                  <p>동의를 거부할 권리가 있으며, 거부하면 회원가입을 할 수 없습니다.</p>
+                  <label>
+                    <input
+                      type='checkbox'
+                      checked={privacyConsent}
+                      onChange={(event) => setPrivacyConsent(event.target.checked)}
+                      required
+                    />
+                    필수 개인정보 수집·이용에 동의합니다.
+                  </label>
+                  <small>
+                    근거: <a href='https://www.law.go.kr/법령/개인정보보호법/제15조' target='_blank' rel='noreferrer'>개인정보 보호법 제15조</a>,{' '}
+                    <a href='https://www.law.go.kr/법령/개인정보보호법/제22조' target='_blank' rel='noreferrer'>제22조</a>,{' '}
+                    <a href='https://www.law.go.kr/법령/개인정보보호법/제30조' target='_blank' rel='noreferrer'>제30조</a>
+                  </small>
+                </section>
+              )}
 
               <button className='login-modal__submit' type='submit' disabled={isSubmitting}>
                 {isSubmitting ? '처리 중...' : isSignUp ? '이메일로 회원가입' : '이메일로 로그인'}

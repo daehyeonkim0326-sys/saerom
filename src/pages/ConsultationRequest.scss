@@ -266,6 +266,33 @@
       line-height: 1.7;
     }
 
+    dl {
+      display: grid;
+      gap: 10px;
+      margin: 0 0 14px;
+    }
+
+    dl > div { display: grid; gap: 3px; }
+
+    dt { color: #34324f; font-size: 12px; font-weight: 700; }
+
+    dd {
+      margin: 0;
+      color: #68678a;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    small {
+      display: block;
+      margin: 0 0 14px;
+      color: #68678a;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    a { color: #3b34c8; text-decoration: underline; }
+
     label {
       display: flex;
       align-items: center;

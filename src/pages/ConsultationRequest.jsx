@@ -119,6 +119,16 @@ const ConsultationRequest = ({ isLoggedIn, onToggleLogin }) => {
 
     const form = event.currentTarget
     const formData = new FormData(form)
+    const optionalPrivacyAgreed = formData.get('optional_privacy_agreed') === 'on'
+    const hasOptionalInformation = Boolean(
+      formData.get('site_detail_address').trim()
+      || formData.get('customer_request').trim()
+      || files.length,
+    )
+    if (hasOptionalInformation && !optionalPrivacyAgreed) {
+      setNotice({ type: 'error', text: '상세 주소, 평면도 또는 요청사항을 제출하려면 선택 개인정보 수집·이용에 동의해 주세요. 동의하지 않으려면 선택 항목을 비워 주세요.' })
+      return
+    }
     const requestId = window.crypto.randomUUID()
     const uploadedPaths = []
     setIsSubmitting(true)
@@ -152,6 +162,7 @@ const ConsultationRequest = ({ isLoggedIn, onToggleLogin }) => {
         referral_source: formData.get('referral_source'),
         customer_request: formData.get('customer_request').trim() || null,
         privacy_agreed: formData.get('privacy_agreed') === 'on',
+        optional_privacy_agreed: optionalPrivacyAgreed,
       })
       if (error) throw error
 
@@ -235,7 +246,7 @@ const ConsultationRequest = ({ isLoggedIn, onToggleLogin }) => {
                     주소 검색
                   </button>
                 </div>
-                <label htmlFor='site-detail-address'>상세 주소 <em>필수</em></label>
+                <label htmlFor='site-detail-address'>상세 주소 <span>(선택)</span></label>
                 <input
                   id='site-detail-address'
                   ref={detailAddressRef}
@@ -320,10 +331,38 @@ const ConsultationRequest = ({ isLoggedIn, onToggleLogin }) => {
 
           <section className='consultation-form__privacy'>
             <h2>개인정보 수집 및 이용 동의</h2>
-            <p>상담 접수 및 안내를 위해 성함, 연락처, 이메일, 현장 위치 등 신청서에 작성한 정보를 수집·이용합니다. 상담 정보와 첨부 파일은 상담 완료 처리일부터 1년간 보관한 뒤 삭제합니다. 상담 신청 정보는 관리자 계정만 확인할 수 있으며, 관련 법령에 별도 보관 의무가 있는 경우 해당 법령을 따릅니다.</p>
+            <dl>
+              <div>
+                <dt>수집·이용 목적</dt>
+                <dd>인테리어 상담 신청 접수, 상담 내용 검토, 견적·일정 안내 및 신청 관련 문의 응대</dd>
+              </div>
+              <div>
+                <dt>수집 항목</dt>
+                <dd><strong>필수</strong> 성함, 연락처, 이메일, 도로명 주소, 상담 유형, 희망 스타일, 공사 사유, 면적, 예산, 공사 시작 희망일, 입주 예정일, 유입 경로</dd>
+                <dd><strong>선택</strong> 상세 주소, 평면도 파일(PDF/JPG/PNG, 최대 2개), 고객 요청사항</dd>
+              </div>
+              <div>
+                <dt>보유 및 이용 기간</dt>
+                <dd>상담 완료 처리일부터 1년간 보관한 뒤 신청 정보와 첨부 파일을 삭제합니다. 다만, 다른 법령에 따라 보존해야 하는 정보는 해당 법령에서 정한 기간 동안 별도 보관합니다.</dd>
+              </div>
+              <div>
+                <dt>동의 거부 권리 및 불이익</dt>
+                <dd>개인정보 수집·이용 동의를 거부할 수 있습니다. 필수 항목 동의를 거부하면 상담 신청을 접수할 수 없습니다. 선택 항목은 동의하지 않아도 상담 신청이 가능합니다.</dd>
+              </div>
+            </dl>
+            <p>상담 정보와 첨부 파일은 관리자 계정만 확인합니다. 자유 기재란이나 첨부 파일에는 상담에 불필요한 민감정보를 입력하지 마세요.</p>
+            <small>
+              관련 법령: <a href='https://www.law.go.kr/lsLinkCommonInfo.do?lsJoLnkSeq=1020398563' target='_blank' rel='noreferrer'>개인정보 보호법 제15조</a>,{' '}
+              <a href='https://law.go.kr/lsLinkCommonInfo.do?lsJoLnkSeq=1022694673' target='_blank' rel='noreferrer'>제22조</a>,{' '}
+              <a href='https://www.law.go.kr/lsLinkCommonInfo.do?lsJoLnkSeq=1029334975' target='_blank' rel='noreferrer'>제21조</a>
+            </small>
             <label>
               <input type='checkbox' name='privacy_agreed' required />
-              개인정보 수집 및 이용에 동의합니다. <em>필수</em>
+              필수 개인정보 수집·이용에 동의합니다. <em>필수</em>
+            </label>
+            <label>
+              <input type='checkbox' name='optional_privacy_agreed' />
+              상세 주소·평면도·고객 요청사항의 수집·이용에 동의합니다. <span>(선택)</span>
             </label>
           </section>
 

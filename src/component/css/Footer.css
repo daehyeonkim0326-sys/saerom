@@ -73,6 +73,12 @@
   line-height: 1.7;
   overflow-wrap: anywhere;
 }
+.site-footer__hours {
+  margin: 4px 0 0;
+  color: #e6edff;
+  font-size: 13px;
+  line-height: 1.7;
+}
 .site-footer__copyright {
   margin: 22px 0 0;
   color: #c1cbea;

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Pencil, Trash2 } from 'lucide-react'
+import ImageSlider from '../component/common/ImageSlider'
 import { deletePostImages, fetchPosts, removePost } from '../data/posts'
 import { supabase } from '../lib/supabase.js'
 import './MyPosts.scss'
@@ -98,7 +99,11 @@ const MyPosts = ({ isLoggedIn }) => {
             <div className='my-posts-page__list'>
               {posts.map((post) => (
                 <article className='my-posts-page__post' key={post.id}>
-                  {post.image && <img src={post.image} alt='' />}
+                  {post.images?.length > 0 && (
+                    <Link to={`/post/${post.id}`} state={{ from: '/my-posts' }} viewTransition aria-label={`${post.title} 게시물 보기`}>
+                      <ImageSlider images={post.images} title={post.title} openOnImageClick transitionName={`post-image-${post.id}`} />
+                    </Link>
+                  )}
                   <div className='my-posts-page__post-body'>
                     <span>{post.category}</span>
                     <div className='my-posts-page__title-row'>

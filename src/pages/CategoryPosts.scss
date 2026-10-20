@@ -70,13 +70,21 @@
 }
 
 .category-post {
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   background: #ffffff;
   color: inherit;
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  .image-slider,
+  .image-slider__image-button,
+  .image-slider__image-button > img,
+  .image-slider__thumbnail {
+    overflow: hidden;
+    border-radius: 10px;
+  }
 
   &:hover {
     transform: translateY(-3px);
