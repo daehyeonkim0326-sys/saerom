@@ -80,10 +80,13 @@
 
   .image-slider,
   .image-slider__image-button,
-  .image-slider__image-button > img,
-  .image-slider__thumbnail {
+  .image-slider__viewport {
     overflow: hidden;
     border-radius: 10px;
+  }
+
+  .image-slider__track img {
+    border-radius: 0;
   }
 
   &:hover {

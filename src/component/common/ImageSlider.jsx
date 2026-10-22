@@ -30,23 +30,36 @@ const ImageSlider = ({ images = [], title = '', locations = [], detail = false, 
 
   if (!images.length) return null
 
+  const imageTrack = (
+    <div
+      className='image-slider__track'
+      style={{
+        '--image-count': images.length,
+        width: `${images.length * 100}%`,
+        transform: `translateX(-${activeIndex * (100 / images.length)}%)`,
+      }}
+    >
+      {images.map((image, index) => (
+        <img
+          key={`${image}-${index}`}
+          src={image}
+          alt={detail ? `${title} 사진 ${index + 1}` : ''}
+          style={index === activeIndex && transitionName ? { viewTransitionName: transitionName } : undefined}
+        />
+      ))}
+    </div>
+  )
+
   return (
     <>
     <div className={`image-slider${detail ? ' image-slider--detail' : ''}`} aria-label={`${title} 이미지`}>
       {openOnImageClick ? (
-        <img
-          className='image-slider__thumbnail'
-          src={images[activeIndex]}
-          alt=''
-          style={transitionName ? { viewTransitionName: transitionName } : undefined}
-        />
+        <div className='image-slider__viewport' aria-label={`${title} 이미지`}>
+          {imageTrack}
+        </div>
       ) : (
         <button className='image-slider__image-button' type='button' aria-label='이미지 크게 보기' onClick={() => setIsViewerOpen(true)}>
-          <img
-            src={images[activeIndex]}
-            alt={detail ? `${title} 사진 ${activeIndex + 1}` : ''}
-            style={transitionName ? { viewTransitionName: transitionName } : undefined}
-          />
+          {imageTrack}
         </button>
       )}
       {images.length > 1 && <>
