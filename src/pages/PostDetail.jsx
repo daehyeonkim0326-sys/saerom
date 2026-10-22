@@ -224,7 +224,7 @@ const PostDetail = ({ isAdmin }) => {
           </div>
           {ownerActionError && <p className='detail-owner-error' role='alert'>{ownerActionError}</p>}
 
-          {post.images?.length > 0 && <div className='post-detail__images'><ImageSlider images={post.images} title={post.title} detail transitionName={`post-image-${post.id}`} /></div>}
+          {post.images?.length > 0 && <div className='post-detail__images'><ImageSlider images={post.images} title={post.title} locations={post.category === 'Portfolio' ? post.imageLocations : []} detail transitionName={`post-image-${post.id}`} /></div>}
 
           <div style={{ paddingTop: '28px', textAlign: 'left' }}>
             <h1 style={{ margin: '0 0 12px', fontSize: 'clamp(28px, 5vw, 40px)', textAlign: 'left' }}>{post.title}</h1>

@@ -76,6 +76,7 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
           path,
           file: null,
           preview: post.images[index],
+          location: post.imageLocations?.[index] ?? '',
         })),
       })
       originalImagePathsRef.current = imagePaths
@@ -114,6 +115,7 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
       path: null,
       file,
       preview: URL.createObjectURL(file),
+      location: '',
     }))
     setForm((current) => ({ ...current, images: [...current.images, ...newImages] }))
     event.target.value = ''
@@ -125,6 +127,13 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
     setForm((current) => ({
       ...current,
       images: current.images.filter((image) => image.id !== imageId),
+    }))
+  }
+
+  const handleImageLocationChange = (imageId, location) => {
+    setForm((current) => ({
+      ...current,
+      images: current.images.map((image) => image.id === imageId ? { ...image, location } : image),
     }))
   }
 
@@ -184,6 +193,9 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
         category: form.category,
         image_path: imagePaths[0] ?? null,
         image_paths: imagePaths,
+        image_locations: form.category === 'Portfolio'
+          ? form.images.map((image) => image.location?.trim() ?? '')
+          : [],
       }
 
       if (isEditing) {
@@ -330,6 +342,17 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
             {form.images.map((image, index) => (
               <div className='write-form__image-preview' key={image.id}>
                 <img className='write-form__preview' src={image.preview} alt={`게시물 사진 ${index + 1} 미리보기`} />
+                {form.category === 'Portfolio' && (
+                  <input
+                    className='write-form__image-location'
+                    type='text'
+                    value={image.location ?? ''}
+                    maxLength={100}
+                    aria-label={`${index + 1}번 사진 장소 이름`}
+                    placeholder='장소 이름 (선택)'
+                    onChange={(event) => handleImageLocationChange(image.id, event.target.value)}
+                  />
+                )}
                 <button
                   className='write-form__image-remove'
                   type='button'

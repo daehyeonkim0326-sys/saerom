@@ -11,6 +11,7 @@ const mapPost = (post) => {
   const images = imagePaths.map((path) =>
     supabase.storage.from(POST_IMAGE_BUCKET).getPublicUrl(path).data.publicUrl,
   )
+  const imageLocations = imagePaths.map((_, index) => post.image_locations?.[index] ?? '')
 
   return {
     id: post.id,
@@ -21,6 +22,7 @@ const mapPost = (post) => {
     authorRole: post.author_role,
     imagePaths,
     images,
+    imageLocations,
     imagePath: imagePaths[0] ?? null,
     image: images[0] ?? '',
     createdAt: post.created_at,

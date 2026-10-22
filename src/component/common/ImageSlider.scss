@@ -67,6 +67,14 @@
   }
 }
 
+.image-slider__location {
+  margin: 7px 0 0;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+}
+
 ::view-transition-group(*) {
   animation-duration: 480ms;
   animation-timing-function: cubic-bezier(0.2, 0.75, 0.25, 1);

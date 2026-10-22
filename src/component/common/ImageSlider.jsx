@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { ArrowLeft, ArrowRight, X } from 'lucide-react'
 import './ImageSlider.scss'
 
-const ImageSlider = ({ images = [], title = '', detail = false, openOnImageClick = false, transitionName }) => {
+const ImageSlider = ({ images = [], title = '', locations = [], detail = false, openOnImageClick = false, transitionName }) => {
   const [activeIndex, setActiveIndex] = useState(0)
   const [isViewerOpen, setIsViewerOpen] = useState(false)
 
@@ -59,6 +59,7 @@ const ImageSlider = ({ images = [], title = '', detail = false, openOnImageClick
         <span className='image-slider__count' aria-live='polite'>{activeIndex + 1} / {images.length}</span>
       </>}
     </div>
+    {locations[activeIndex]?.trim() && <p className='image-slider__location'>{locations[activeIndex]}</p>}
     {isViewerOpen && createPortal(<div className='image-viewer' role='dialog' aria-modal='true' aria-label={`${title} 이미지 크게 보기`} onClick={() => setIsViewerOpen(false)}>
         <button className='image-viewer__close' type='button' aria-label='닫기' onClick={() => setIsViewerOpen(false)}><X size={24} /></button>
         {images.length > 1 && <button className='image-viewer__arrow image-viewer__arrow--left' type='button' aria-label='이전 이미지' onClick={(event) => { event.stopPropagation(); setActiveIndex((index) => (index - 1 + images.length) % images.length) }}><ArrowLeft size={24} /></button>}

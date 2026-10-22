@@ -69,7 +69,7 @@ const CategoryPosts = ({ isLoggedIn, isAdmin }) => {
               viewTransition
               key={post.id}
             >
-              {post.images?.length > 0 && <ImageSlider images={post.images} title={post.title} openOnImageClick transitionName={`post-image-${post.id}`} />}
+              {post.images?.length > 0 && <ImageSlider images={post.images} title={post.title} locations={category === 'Portfolio' ? post.imageLocations : []} openOnImageClick transitionName={`post-image-${post.id}`} />}
               <div className='category-post__body'>
                 <span>{post.category}</span>
                 <h2>{post.title}</h2>
