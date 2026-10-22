@@ -63,13 +63,20 @@
 }
 
 .category-post {
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   background: #ffffff;
   color: inherit;
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.category-post .image-slider,
+.category-post .image-slider__image-button,
+.category-post .image-slider__image-button > img,
+.category-post .image-slider__thumbnail {
+  overflow: hidden;
+  border-radius: 10px;
 }
 .category-post:hover {
   transform: translateY(-3px);

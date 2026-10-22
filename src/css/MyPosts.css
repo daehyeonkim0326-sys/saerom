@@ -54,7 +54,7 @@
 .my-posts-page__post {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #fff;
@@ -71,6 +71,10 @@
   aspect-ratio: 16/10;
   object-fit: cover;
   background: #e5e7eb;
+}
+
+.my-posts-page__post > a {
+  display: block;
 }
 
 .my-posts-page__post-body {

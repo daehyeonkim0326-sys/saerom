@@ -92,8 +92,8 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
     const selectedFiles = Array.from(event.target.files ?? [])
     if (!selectedFiles.length) return
 
-    if (form.images.length + selectedFiles.length > 10) {
-      setSubmitError('게시물 사진은 최대 10장까지 첨부할 수 있습니다.')
+    if (form.images.length + selectedFiles.length > 20) {
+      setSubmitError('게시물 사진은 최대 20장까지 첨부할 수 있습니다.')
       event.target.value = ''
       return
     }
@@ -316,7 +316,7 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
         </label>
 
         <label>
-          <span>사진 첨부 (최대 10장)</span>
+          <span>사진 첨부 (최대 20장)</span>
           <input
             type='file'
             multiple

@@ -232,6 +232,37 @@
   font-size: 12px;
   line-height: 1.7;
 }
+.consultation-form__privacy dl {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+.consultation-form__privacy dl > div {
+  display: grid;
+  gap: 3px;
+}
+.consultation-form__privacy dt {
+  color: #34324f;
+  font-size: 12px;
+  font-weight: 700;
+}
+.consultation-form__privacy dd {
+  margin: 0;
+  color: #68678a;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.consultation-form__privacy small {
+  display: block;
+  margin: 0 0 14px;
+  color: #68678a;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.consultation-form__privacy a {
+  color: #3b34c8;
+  text-decoration: underline;
+}
 .consultation-form__privacy label {
   display: flex;
   align-items: center;
