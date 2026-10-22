@@ -23,7 +23,7 @@ const Footer = () => {
         <p className='site-footer__copyright'>Copyright © <strong>새롬인테리어.</strong> All rights reserved.</p>
         <nav className='site-footer__socials' aria-label='새롬 인테리어 소셜 미디어'>
           <a
-            href='https://m.blog.naver.com/yoyo7701'
+            href='https://blog.naver.com/sr_interior'
             target='_blank'
             rel='noreferrer'
             aria-label='네이버 블로그 새 탭에서 열기'
