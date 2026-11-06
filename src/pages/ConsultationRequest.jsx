@@ -7,6 +7,7 @@ import './ConsultationRequest.scss'
 const FLOOR_PLAN_BUCKET = 'consultation-floor-plans'
 const POSTCODE_SCRIPT_URL = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
 const MAX_FILE_SIZE = 10 * 1024 * 1024
+const PRIVACY_NOTICE_VERSION = '2026-10-23'
 const consultationTypes = ['아파트', '주택', '빌라/오피스텔', '상업공간', '부분공사', '기타']
 const budgetOptions = [
   '3천만원 미만',
@@ -83,7 +84,7 @@ const ConsultationRequest = ({ isLoggedIn, onToggleLogin }) => {
   const handleFilesChange = (event) => {
     const nextFiles = Array.from(event.target.files ?? [])
     if (nextFiles.length > 2) {
-      setNotice({ type: 'error', text: '평면도는 최대 2개까지 첨부할 수 있습니다.' })
+      setNotice({ type: 'error', text: '평면도와 시공 장소 사진은 최대 2개까지 첨부할 수 있습니다.' })
       event.target.value = ''
       setFiles([])
       return
@@ -94,7 +95,7 @@ const ConsultationRequest = ({ isLoggedIn, onToggleLogin }) => {
       || file.size > MAX_FILE_SIZE
     ))
     if (invalidFile) {
-      setNotice({ type: 'error', text: '평면도는 PDF, JPG, PNG 파일만 가능하며 파일당 10MB 이하여야 합니다.' })
+      setNotice({ type: 'error', text: 'PDF, JPG, PNG 파일만 가능하며 파일당 10MB 이하여야 합니다.' })
       event.target.value = ''
       setFiles([])
       return
@@ -162,7 +163,9 @@ const ConsultationRequest = ({ isLoggedIn, onToggleLogin }) => {
         referral_source: formData.get('referral_source'),
         customer_request: formData.get('customer_request').trim() || null,
         privacy_agreed: formData.get('privacy_agreed') === 'on',
+        privacy_notice_version: PRIVACY_NOTICE_VERSION,
         optional_privacy_agreed: optionalPrivacyAgreed,
+        optional_privacy_consent_source: optionalPrivacyAgreed ? 'explicit' : 'not_given',
       })
       if (error) throw error
 
@@ -172,6 +175,12 @@ const ConsultationRequest = ({ isLoggedIn, onToggleLogin }) => {
       setNotice({ type: 'success', text: '상담 신청이 접수되었습니다. 확인 후 입력하신 연락처로 안내드리겠습니다.' })
     } catch (error) {
       console.error('상담 신청을 접수하지 못했습니다.', error)
+      if (uploadedPaths.length) {
+        const { error: cleanupError } = await supabase.functions.invoke('cleanup-failed-consultation-upload', {
+          body: { requestId },
+        })
+        if (cleanupError) console.error('접수 실패 후 평면도 파일을 정리하지 못했습니다.', cleanupError)
+      }
       const errorCode = error?.code ?? ''
       const errorMessage = error?.message ?? ''
       const isSchemaError = ['PGRST204', 'PGRST205', '42703', '42P01'].includes(errorCode)
@@ -182,7 +191,7 @@ const ConsultationRequest = ({ isLoggedIn, onToggleLogin }) => {
       setNotice({
         type: 'error',
         text: isSchemaError
-          ? '상담 신청 데이터베이스가 최신 입력 항목으로 업데이트되지 않았습니다. 관리자에게 Supabase에서 20261013000000_consultation_requests.sql과 20261013010000_consultation_form_fields.sql을 순서대로 적용해 달라고 요청해 주세요.'
+          ? '상담 신청 데이터베이스가 최신 입력 항목으로 업데이트되지 않았습니다. 관리자에게 Supabase 마이그레이션을 최신 파일까지 순서대로 적용해 달라고 요청해 주세요.'
           : isPermissionError
             ? files.length > 0 && uploadedPaths.length < files.length
               ? '평면도 업로드 권한이 설정되지 않았습니다. 관리자에게 상담 신청 마이그레이션과 Storage 업로드 정책을 확인해 달라고 요청해 주세요.'
@@ -270,8 +279,8 @@ const ConsultationRequest = ({ isLoggedIn, onToggleLogin }) => {
                 </select>
               </label>
               <fieldset className='consultation-form__wide'>
-                <legend>평면도 첨부 <span>(선택)</span></legend>
-                <p className='consultation-form__hint'>평면도를 주시면 보다 정확한 상담을 받으실 수 있습니다.</p>
+                <legend>평면도 및 시공 장소 사진 첨부 <span>(선택)</span></legend>
+                <p className='consultation-form__hint'>평면도와 시공 장소 사진을 함께 첨부해 주시면 보다 정확한 상담을 받으실 수 있습니다.</p>
                 <input
                   name='floor_plans'
                   type='file'
@@ -331,6 +340,7 @@ const ConsultationRequest = ({ isLoggedIn, onToggleLogin }) => {
 
           <section className='consultation-form__privacy'>
             <h2>개인정보 수집 및 이용 동의</h2>
+            <p className='consultation-form__privacy-link'><Link to='/privacy'>개인정보 처리방침 보기</Link></p>
             <dl>
               <div>
                 <dt>수집·이용 목적</dt>

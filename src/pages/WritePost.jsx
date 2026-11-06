@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Trash2 } from 'lucide-react'
+import { GripVertical, Trash2 } from 'lucide-react'
 import './WritePost.scss'
 import {
   ADMIN_ONLY_CATEGORIES,
@@ -35,6 +35,7 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isImageUploading, setIsImageUploading] = useState(false)
   const originalImagePathsRef = useRef([])
+  const draggedImageIdRef = useRef(null)
 
   useEffect(() => {
     if (!isEditing) return undefined
@@ -128,6 +129,27 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
       ...current,
       images: current.images.filter((image) => image.id !== imageId),
     }))
+  }
+
+  const handleMoveImage = (imageId, targetImageId) => {
+    setForm((current) => {
+      const fromIndex = current.images.findIndex((image) => image.id === imageId)
+      const toIndex = current.images.findIndex((image) => image.id === targetImageId)
+      if (fromIndex < 0 || toIndex < 0 || toIndex >= current.images.length) return current
+
+      const images = [...current.images]
+      const [movedImage] = images.splice(fromIndex, 1)
+      images.splice(toIndex, 0, movedImage)
+      return { ...current, images }
+    })
+  }
+
+  const handleImageDrop = (targetImageId) => {
+    const draggedImageId = draggedImageIdRef.current
+    if (draggedImageId && draggedImageId !== targetImageId) {
+      handleMoveImage(draggedImageId, targetImageId)
+    }
+    draggedImageIdRef.current = null
   }
 
   const handleImageLocationChange = (imageId, location) => {
@@ -336,12 +358,32 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
             onChange={handleImageUpload}
           />
         </label>
+        <p className='write-form__privacy-note'>등록한 게시물과 사진은 공개되며, 회원 탈퇴 후에도 남습니다. 게시물에 본인이나 다른 사람을 식별할 수 있는 정보가 포함되지 않았는지 확인해 주세요.</p>
 
         {form.images.length > 0 && (
           <div className='write-form__image-grid'>
             {form.images.map((image, index) => (
-              <div className='write-form__image-preview' key={image.id}>
+              <div
+                className={`write-form__image-preview${draggedImageIdRef.current === image.id ? ' is-dragging' : ''}`}
+                key={image.id}
+                draggable
+                onDragStart={(event) => {
+                  draggedImageIdRef.current = image.id
+                  event.dataTransfer.effectAllowed = 'move'
+                  event.dataTransfer.setData('text/plain', image.id)
+                }}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => {
+                  event.preventDefault()
+                  handleImageDrop(image.id)
+                }}
+                onDragEnd={() => { draggedImageIdRef.current = null }}
+              >
+                <div className='write-form__image-drag-handle' aria-hidden='true'>
+                  <GripVertical size={16} /> 사진을 끌어 순서 변경
+                </div>
                 <img className='write-form__preview' src={image.preview} alt={`게시물 사진 ${index + 1} 미리보기`} />
+                <span className='write-form__image-order'>{index + 1}번째 사진</span>
                 {form.category === 'Portfolio' && (
                   <input
                     className='write-form__image-location'

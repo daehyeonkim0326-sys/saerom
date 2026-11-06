@@ -11,7 +11,9 @@ import MyPosts from './pages/MyPosts.jsx'
 import About from './pages/About.jsx'
 import ConsultationRequest from './pages/ConsultationRequest.jsx'
 import AdminConsultations from './pages/AdminConsultations.jsx'
+import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import LoginModal from './component/common/LoginModal.jsx'
+import Footer from './component/common/Footer.jsx'
 import { supabase } from './lib/supabase.js'
 
 const ScrollToTop = () => {
@@ -28,7 +30,6 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
-  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false)
 
   useEffect(() => {
     if (!supabase) return undefined
@@ -37,10 +38,6 @@ function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsLoggedIn(Boolean(session))
       setIsAdmin(session?.user?.app_metadata?.role === 'admin')
-      if (event === 'PASSWORD_RECOVERY') {
-        setIsPasswordRecovery(true)
-        setIsLoginOpen(true)
-      }
     })
 
     supabase.auth.getSession().then(({ data, error }) => {
@@ -71,6 +68,7 @@ function App() {
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ScrollToTop />
       <Routes>
+        <Route path='/privacy' element={<PrivacyPolicy isLoggedIn={isLoggedIn} onToggleLogin={handleToggleLogin} />} />
         <Route
           path="/"
           element={<Layout isLoggedIn={isLoggedIn} onToggleLogin={handleToggleLogin} />}
@@ -152,17 +150,15 @@ function App() {
           }
         />
       </Routes>
+      <Footer />
       {isLoginOpen && (
         <LoginModal
-          isPasswordRecovery={isPasswordRecovery}
           onClose={() => {
             setIsLoginOpen(false)
-            setIsPasswordRecovery(false)
           }}
           onAuthenticated={() => {
             setIsLoggedIn(true)
             setIsLoginOpen(false)
-            setIsPasswordRecovery(false)
           }}
         />
       )}

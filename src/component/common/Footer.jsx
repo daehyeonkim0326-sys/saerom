@@ -1,4 +1,5 @@
 import './Footer.scss'
+import { Link } from 'react-router-dom'
 import logo from '../../assets/img/logo.svg'
 
 const Footer = () => {
@@ -20,6 +21,9 @@ const Footer = () => {
         </div>
         <p className='site-footer__address'>주소 : 강원특별자치도 원주시 늘품로 126 (단구동)</p>
         <p className='site-footer__hours'>운영시간 : 오전 8시 ~ 오후 8시</p>
+        <nav className='site-footer__legal' aria-label='법적 안내'>
+          <Link to='/privacy'>개인정보 처리방침</Link>
+        </nav>
         <p className='site-footer__copyright'>Copyright © <strong>새롬인테리어.</strong> All rights reserved.</p>
         <nav className='site-footer__socials' aria-label='새롬 인테리어 소셜 미디어'>
           <a

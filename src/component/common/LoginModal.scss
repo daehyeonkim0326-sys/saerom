@@ -123,6 +123,21 @@
   }
 }
 
+.login-modal__field-hint {
+  margin-top: -5px;
+  color: #68678a;
+  font-size: 11px;
+  line-height: 1.4;
+
+  &--error {
+    color: #d93025;
+  }
+
+  &--available {
+    color: #16803c;
+  }
+}
+
 .login-modal__privacy {
   display: grid;
   gap: 7px;

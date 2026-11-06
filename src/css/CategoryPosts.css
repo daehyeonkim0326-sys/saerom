@@ -73,10 +73,12 @@
 }
 .category-post .image-slider,
 .category-post .image-slider__image-button,
-.category-post .image-slider__image-button > img,
-.category-post .image-slider__thumbnail {
+.category-post .image-slider__viewport {
   overflow: hidden;
   border-radius: 10px;
+}
+.category-post .image-slider__track img {
+  border-radius: 0;
 }
 .category-post:hover {
   transform: translateY(-3px);
