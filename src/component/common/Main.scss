@@ -78,18 +78,21 @@
   }
 
   &__link {
-    position: relative;
+    position: absolute;
     z-index: 1;
-    width: min(78%, 1200px);
-    height: 78%;
-    display: block;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
   }
 
   &__image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: auto;
+    height: auto;
+    max-width: min(78%, 1200px);
+    max-height: 78%;
+    object-fit: contain;
     object-position: center;
     display: block;
     border-radius: 18px;
@@ -285,11 +288,15 @@
     height: clamp(300px, 100vw, 440px);
 
     &__link {
-      width: 88%;
-      height: 76%;
+      inset: 0;
     }
 
-    &__image,
+    &__image {
+      max-width: 88%;
+      max-height: 76%;
+      border-radius: 12px;
+    }
+
     &__no-image {
       border-radius: 12px;
     }
