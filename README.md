@@ -41,7 +41,7 @@ The migrations must be applied to the Supabase project before enabling the consu
 
 ## Community Posts
 
-Run the community-post migrations in timestamp order, through `20261023000000_portfolio_image_locations.sql`. Posts are shared through the `community_posts` table and images through the public `community-post-images` bucket. Each post can include up to 20 JPG, PNG, WEBP, or GIF images, each up to 10 MB. Portfolio posts can store an optional place name for each image. Existing single-image posts are migrated automatically and continue using their original image.
+Run the community-post migrations in timestamp order, through `20261125000000_portfolio_image_comparison_pairs.sql`. Posts are shared through the `community_posts` table and images through the public `community-post-images` bucket. Each post can include up to 20 JPG, PNG, WEBP, or GIF images, each up to 10 MB. Portfolio posts can store an optional place name for each image and choose which image pairs use a comparison slider. Existing single-image posts are migrated automatically and continue using their original image.
 
 Only admins (`app_metadata.role = 'admin'`) can publish in `Portfolio` and `공지`; signed-in members can publish in `새롬 이야기` and `후기`. These rules are enforced with RLS. The home slider shows only image posts written by admins, and the home page also lists recent `후기` and `공지` posts. Existing browser-local posts are not migrated automatically; repost them after applying this migration if they should appear in the shared boards.
 

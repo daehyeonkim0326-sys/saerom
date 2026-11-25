@@ -73,6 +73,62 @@
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 14px;
 }
+.write-form__photo-options {
+  display: grid;
+  gap: 14px;
+}
+.write-form__photo-options > p {
+  margin: 0;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 700;
+}
+.write-form__photo-options label span small {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 400;
+}
+.write-form__photo-options .write-form__pair-note {
+  margin: -6px 0 0;
+  font-weight: 400;
+}
+.write-form__portfolio-images {
+  display: grid;
+  gap: 16px;
+}
+.write-form__image-pairs {
+  display: grid;
+  gap: 16px;
+}
+.write-form__pair-note {
+  margin: -12px 0 0;
+  color: #5b5f75;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.write-form__image-pair {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #dbe1f2;
+  border-radius: 12px;
+  background: #f8f9ff;
+}
+.write-form__image-pair h2 {
+  margin: 0 0 10px;
+  color: #29238f;
+  font-size: 14px;
+}
+.write-form__image-pair-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.write-form__single-images > h2 {
+  margin: 0 0 8px;
+  color: #4b5563;
+  font-size: 14px;
+}
 .write-form__image-preview {
   display: flex;
   flex-direction: column;
@@ -205,6 +261,12 @@
   .write-page__notice {
     padding: 22px 18px;
   }
+  .write-form__image-pair {
+    padding: 10px;
+  }
+  .write-form__image-pair-items {
+    grid-template-columns: 1fr;
+  }
 }
 @media (min-width: 601px) and (max-width: 900px) {
   .write-page {
@@ -214,4 +276,6 @@
   .write-page__notice {
     padding: 28px;
   }
-}/*# sourceMappingURL=WritePost.css.map */
+}
+
+/*# sourceMappingURL=WritePost.css.map */

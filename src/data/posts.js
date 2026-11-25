@@ -21,6 +21,7 @@ const mapPost = (post) => {
     authorId: post.author_id,
     authorRole: post.author_role,
     imagePaths,
+    imageComparisonPairs: (post.image_comparison_pairs ?? []).filter((pair) => Array.isArray(pair) && pair.length === 2),
     images,
     imageLocations,
     imagePath: imagePaths[0] ?? null,

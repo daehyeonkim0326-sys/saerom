@@ -23,6 +23,37 @@ const PostDetail = ({ isAdmin }) => {
   const [isAnswerSaving, setIsAnswerSaving] = useState(false)
   const [answerError, setAnswerError] = useState('')
   const canHaveAdminAnswer = post?.category === '후기'
+  const portfolioImageGroups = (() => {
+    if (post?.category !== 'Portfolio') return []
+    const comparisonByPath = new Map()
+    ;(post.imageComparisonPairs ?? []).forEach((paths) => {
+      const indexes = paths.map((path) => post.imagePaths.indexOf(path))
+      if (indexes.some((index) => index < 0)) return
+      const comparison = {
+        type: 'comparison',
+        key: paths.join(':'),
+        images: indexes.map((index) => post.images[index]),
+        imageNumbers: indexes.map((index) => index + 1),
+      }
+      paths.forEach((path) => comparisonByPath.set(path, comparison))
+    })
+    const emittedComparisons = new Set()
+    return post.imagePaths.map((path, index) => {
+      const comparison = comparisonByPath.get(path)
+      if (comparison) {
+        if (emittedComparisons.has(comparison)) return null
+        emittedComparisons.add(comparison)
+        return comparison
+      }
+      return {
+        type: 'single',
+        key: path,
+        image: post.images[index],
+        location: post.imageLocations[index],
+        imageNumber: index + 1,
+      }
+    }).filter(Boolean)
+  })()
 
   useEffect(() => {
     let isMounted = true
@@ -228,23 +259,32 @@ const PostDetail = ({ isAdmin }) => {
           {post.category === 'Portfolio' && (
             <h1 style={{ margin: '28px 0 16px', fontSize: 'clamp(28px, 5vw, 40px)', textAlign: 'left' }}>{post.title}</h1>
           )}
-          {post.category === 'Portfolio' && post.images?.length >= 2 && Array.from(
-            { length: Math.floor(post.images.length / 2) },
-            (_, pairIndex) => pairIndex * 2,
-          ).map((startIndex) => (
-            <ImageCompare
-              key={`${post.id}-comparison-${startIndex}`}
-              images={post.images.slice(startIndex, startIndex + 2)}
-              title={post.title}
-              imageNumbers={[startIndex + 1, startIndex + 2]}
-            />
-          ))}
-          {post.images?.length > (post.category === 'Portfolio' ? Math.floor(post.images.length / 2) * 2 : 0) && (
+          {post.category === 'Portfolio' ? (
+            <div className='post-detail__portfolio-images'>
+              {portfolioImageGroups.map((group) => group.type === 'comparison' ? (
+                <ImageCompare
+                  key={group.key}
+                  images={group.images}
+                  title={post.title}
+                  imageNumbers={group.imageNumbers}
+                />
+              ) : (
+                <div className='post-detail__images' key={group.key}>
+                  <ImageSlider
+                    images={[group.image]}
+                    title={`${post.title} 사진 ${group.imageNumber}`}
+                    locations={[group.location]}
+                    detail
+                    transitionName={`post-image-${post.id}-${group.imageNumber}`}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : post.images?.length > 0 && (
             <div className='post-detail__images'>
               <ImageSlider
-                images={post.category === 'Portfolio' ? post.images.slice(Math.floor(post.images.length / 2) * 2) : post.images}
+                images={post.images}
                 title={post.title}
-                locations={post.category === 'Portfolio' ? post.imageLocations.slice(Math.floor(post.images.length / 2) * 2) : []}
                 detail
                 transitionName={`post-image-${post.id}`}
               />

@@ -68,6 +68,9 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
       }
 
       const imagePaths = post.imagePaths ?? (post.imagePath ? [post.imagePath] : [])
+      const comparisonIdForPath = new Map(
+        (post.imageComparisonPairs ?? []).flatMap((pair, pairIndex) => pair.map((path) => [path, `saved-pair-${pairIndex}`])),
+      )
       setForm({
         title: post.title,
         description: post.description,
@@ -78,6 +81,7 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
           file: null,
           preview: post.images[index],
           location: post.imageLocations?.[index] ?? '',
+          comparisonId: comparisonIdForPath.get(path) ?? null,
         })),
       })
       originalImagePathsRef.current = imagePaths
@@ -90,9 +94,20 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
     }
   }, [isEditing, isLoggedIn, isAdmin, postId])
 
-  const handleImageUpload = (event) => {
+  const handleImageUpload = (event, isComparison = false) => {
     const selectedFiles = Array.from(event.target.files ?? [])
     if (!selectedFiles.length) return
+
+    if (isComparison && selectedFiles.length !== 2) {
+      setSubmitError('비교 슬라이더에는 사진을 정확히 두 장 선택해 주세요.')
+      event.target.value = ''
+      return
+    }
+    if (!isComparison && form.category === 'Portfolio' && selectedFiles.length !== 1) {
+      setSubmitError('단일 사진 추가는 사진을 한 장씩 선택해 주세요.')
+      event.target.value = ''
+      return
+    }
 
     if (form.images.length + selectedFiles.length > 20) {
       setSubmitError('게시물 사진은 최대 20장까지 첨부할 수 있습니다.')
@@ -111,12 +126,14 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
     }
 
     setSubmitError('')
+    const comparisonId = isComparison ? crypto.randomUUID() : null
     const newImages = selectedFiles.map((file) => ({
       id: crypto.randomUUID(),
       path: null,
       file,
       preview: URL.createObjectURL(file),
       location: '',
+      comparisonId,
     }))
     setForm((current) => ({ ...current, images: [...current.images, ...newImages] }))
     event.target.value = ''
@@ -127,7 +144,11 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
     if (removedImage?.file) URL.revokeObjectURL(removedImage.preview)
     setForm((current) => ({
       ...current,
-      images: current.images.filter((image) => image.id !== imageId),
+      images: current.images
+        .filter((image) => image.id !== imageId)
+        .map((image) => removedImage?.comparisonId && image.comparisonId === removedImage.comparisonId
+          ? { ...image, comparisonId: null }
+          : image),
     }))
   }
 
@@ -157,6 +178,46 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
       ...current,
       images: current.images.map((image) => image.id === imageId ? { ...image, location } : image),
     }))
+  }
+
+  const renderImagePreview = (image) => {
+    const index = form.images.findIndex((item) => item.id === image.id)
+    return (
+      <div
+        className={`write-form__image-preview${draggedImageIdRef.current === image.id ? ' is-dragging' : ''}`}
+        key={image.id}
+        draggable
+        onDragStart={(event) => {
+          draggedImageIdRef.current = image.id
+          event.dataTransfer.effectAllowed = 'move'
+          event.dataTransfer.setData('text/plain', image.id)
+        }}
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={(event) => {
+          event.preventDefault()
+          handleImageDrop(image.id)
+        }}
+        onDragEnd={() => { draggedImageIdRef.current = null }}
+      >
+        <div className='write-form__image-drag-handle' aria-hidden='true'><GripVertical size={16} /> 사진을 끌어 순서 변경</div>
+        <img className='write-form__preview' src={image.preview} alt={`게시물 사진 ${index + 1} 미리보기`} />
+        <span className='write-form__image-order'>{index + 1}번째 사진</span>
+        {form.category === 'Portfolio' && (
+          <input
+            className='write-form__image-location'
+            type='text'
+            value={image.location ?? ''}
+            maxLength={100}
+            aria-label={`${index + 1}번 사진 장소 이름`}
+            placeholder='장소 이름 (선택)'
+            onChange={(event) => handleImageLocationChange(image.id, event.target.value)}
+          />
+        )}
+        <button className='write-form__image-remove' type='button' aria-label={`${index + 1}번 사진 제거`} onClick={() => handleRemoveImage(image.id)}>
+          <Trash2 size={15} aria-hidden='true' /> 사진 제거
+        </button>
+      </div>
+    )
   }
 
   const handleSubmit = async (event) => {
@@ -208,6 +269,14 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
       }
       const uploadedPathsById = new Map(savedImages)
       const imagePaths = form.images.map((image) => image.path ?? uploadedPathsById.get(image.id))
+      const comparisonPathsById = new Map()
+      form.images.forEach((image, index) => {
+        if (!image.comparisonId || !imagePaths[index]) return
+        const pairPaths = comparisonPathsById.get(image.comparisonId) ?? []
+        pairPaths.push(imagePaths[index])
+        comparisonPathsById.set(image.comparisonId, pairPaths)
+      })
+      const imageComparisonPairs = [...comparisonPathsById.values()].filter((pair) => pair.length === 2)
 
       const postData = {
         title: form.title.trim(),
@@ -218,6 +287,7 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
         image_locations: form.category === 'Portfolio'
           ? form.images.map((image) => image.location?.trim() ?? '')
           : [],
+        image_comparison_pairs: form.category === 'Portfolio' ? imageComparisonPairs : [],
       }
 
       if (isEditing) {
@@ -297,6 +367,11 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
     )
   }
 
+  const comparisonGroups = [...new Set(form.images.filter((image) => image.comparisonId).map((image) => image.comparisonId))]
+    .map((comparisonId) => form.images.filter((image) => image.comparisonId === comparisonId))
+    .filter((pair) => pair.length === 2)
+  const singleImages = form.images.filter((image) => !image.comparisonId)
+
   return (
     <main className='write-page'>
       <form className='write-form' onSubmit={handleSubmit} aria-busy={isSubmitting}>
@@ -349,71 +424,60 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
           />
         </label>
 
-        <label>
-          <span>사진 첨부 (최대 20장)</span>
-          <input
-            type='file'
-            multiple
-            accept='.jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif'
-            onChange={handleImageUpload}
-          />
-        </label>
-        {form.category === 'Portfolio' && <p className='write-form__pair-note'>사진은 등록 순서대로 두 장씩 비교 쌍이 됩니다. 사진을 끌어 순서를 바꿀 수 있어요.</p>}
+        {form.category === 'Portfolio' ? (
+          <div className='write-form__photo-options'>
+            <p>사진 첨부 (최대 20장)</p>
+            <label>
+              <span>비교 슬라이더 사진 추가 <small>사진 두 장을 선택하세요</small></span>
+              <input
+                type='file'
+                multiple
+                accept='.jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif'
+                onChange={(event) => handleImageUpload(event, true)}
+              />
+            </label>
+            <label>
+              <span>단일 사진 추가 <small>사진 한 장씩 선택하세요</small></span>
+              <input
+                type='file'
+                accept='.jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif'
+                onChange={handleImageUpload}
+              />
+            </label>
+            <p className='write-form__pair-note'>사진 순서를 바꾸려면 미리보기를 끌어 이동하세요.</p>
+          </div>
+        ) : (
+          <label>
+            <span>사진 첨부 (최대 20장)</span>
+            <input
+              type='file'
+              multiple
+              accept='.jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif'
+              onChange={handleImageUpload}
+            />
+          </label>
+        )}
         <p className='write-form__privacy-note'>등록한 게시물과 사진은 공개되며, 회원 탈퇴 후에도 남습니다. 게시물에 본인이나 다른 사람을 식별할 수 있는 정보가 포함되지 않았는지 확인해 주세요.</p>
 
         {form.images.length > 0 && (
           form.category === 'Portfolio' ? (
-            <div className='write-form__image-pairs'>
-              {Array.from({ length: Math.ceil(form.images.length / 2) }, (_, pairIndex) => {
-                const startIndex = pairIndex * 2
-                return (
-                  <section className='write-form__image-pair' key={`image-pair-${pairIndex}`}>
-                    <h2>비교 쌍 {pairIndex + 1}</h2>
-                    <div className='write-form__image-pair-items'>
-                      {form.images.slice(startIndex, startIndex + 2).map((image, offset) => {
-                        const index = startIndex + offset
-                        return (
-                          <div
-                            className={`write-form__image-preview${draggedImageIdRef.current === image.id ? ' is-dragging' : ''}`}
-                            key={image.id}
-                            draggable
-                            onDragStart={(event) => {
-                              draggedImageIdRef.current = image.id
-                              event.dataTransfer.effectAllowed = 'move'
-                              event.dataTransfer.setData('text/plain', image.id)
-                            }}
-                            onDragOver={(event) => event.preventDefault()}
-                            onDrop={(event) => {
-                              event.preventDefault()
-                              handleImageDrop(image.id)
-                            }}
-                            onDragEnd={() => { draggedImageIdRef.current = null }}
-                          >
-                            <div className='write-form__image-drag-handle' aria-hidden='true'><GripVertical size={16} /> 사진을 끌어 순서 변경</div>
-                            <img className='write-form__preview' src={image.preview} alt={`게시물 사진 ${index + 1} 미리보기`} />
-                            <span className='write-form__image-order'>{index + 1}번째 사진</span>
-                            <input
-                              className='write-form__image-location'
-                              type='text'
-                              value={image.location ?? ''}
-                              maxLength={100}
-                              aria-label={`${index + 1}번 사진 장소 이름`}
-                              placeholder='장소 이름 (선택)'
-                              onChange={(event) => handleImageLocationChange(image.id, event.target.value)}
-                            />
-                            <button className='write-form__image-remove' type='button' aria-label={`${index + 1}번 사진 제거`} onClick={() => handleRemoveImage(image.id)}>
-                              <Trash2 size={15} aria-hidden='true' /> 사진 제거
-                            </button>
-                          </div>
-                        )
-                      })}
-                    </div>
-                    {form.images.length % 2 === 1 && pairIndex === Math.floor(form.images.length / 2) && (
-                      <p className='write-form__pair-incomplete'>비교할 사진을 한 장 더 추가해 쌍을 완성해 주세요.</p>
-                    )}
-                  </section>
-                )
-              })}
+            <div className='write-form__portfolio-images'>
+              {comparisonGroups.length > 0 && (
+                <div className='write-form__image-pairs'>
+                  {comparisonGroups.map((pair, pairIndex) => (
+                    <section className='write-form__image-pair' key={pair[0].comparisonId}>
+                      <h2>비교 슬라이더 {pairIndex + 1}</h2>
+                      <div className='write-form__image-pair-items'>{pair.map(renderImagePreview)}</div>
+                    </section>
+                  ))}
+                </div>
+              )}
+              {singleImages.length > 0 && (
+                <section className='write-form__single-images'>
+                  <h2>단일 사진</h2>
+                  <div className='write-form__image-grid'>{singleImages.map(renderImagePreview)}</div>
+                </section>
+              )}
             </div>
           ) : (
             <div className='write-form__image-grid'>
