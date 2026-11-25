@@ -358,55 +358,92 @@ const WritePost = ({ isLoggedIn, isAdmin }) => {
             onChange={handleImageUpload}
           />
         </label>
+        {form.category === 'Portfolio' && <p className='write-form__pair-note'>사진은 등록 순서대로 두 장씩 비교 쌍이 됩니다. 사진을 끌어 순서를 바꿀 수 있어요.</p>}
         <p className='write-form__privacy-note'>등록한 게시물과 사진은 공개되며, 회원 탈퇴 후에도 남습니다. 게시물에 본인이나 다른 사람을 식별할 수 있는 정보가 포함되지 않았는지 확인해 주세요.</p>
 
         {form.images.length > 0 && (
-          <div className='write-form__image-grid'>
-            {form.images.map((image, index) => (
-              <div
-                className={`write-form__image-preview${draggedImageIdRef.current === image.id ? ' is-dragging' : ''}`}
-                key={image.id}
-                draggable
-                onDragStart={(event) => {
-                  draggedImageIdRef.current = image.id
-                  event.dataTransfer.effectAllowed = 'move'
-                  event.dataTransfer.setData('text/plain', image.id)
-                }}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={(event) => {
-                  event.preventDefault()
-                  handleImageDrop(image.id)
-                }}
-                onDragEnd={() => { draggedImageIdRef.current = null }}
-              >
-                <div className='write-form__image-drag-handle' aria-hidden='true'>
-                  <GripVertical size={16} /> 사진을 끌어 순서 변경
-                </div>
-                <img className='write-form__preview' src={image.preview} alt={`게시물 사진 ${index + 1} 미리보기`} />
-                <span className='write-form__image-order'>{index + 1}번째 사진</span>
-                {form.category === 'Portfolio' && (
-                  <input
-                    className='write-form__image-location'
-                    type='text'
-                    value={image.location ?? ''}
-                    maxLength={100}
-                    aria-label={`${index + 1}번 사진 장소 이름`}
-                    placeholder='장소 이름 (선택)'
-                    onChange={(event) => handleImageLocationChange(image.id, event.target.value)}
-                  />
-                )}
-                <button
-                  className='write-form__image-remove'
-                  type='button'
-                  aria-label={`${index + 1}번 사진 제거`}
-                  onClick={() => handleRemoveImage(image.id)}
+          form.category === 'Portfolio' ? (
+            <div className='write-form__image-pairs'>
+              {Array.from({ length: Math.ceil(form.images.length / 2) }, (_, pairIndex) => {
+                const startIndex = pairIndex * 2
+                return (
+                  <section className='write-form__image-pair' key={`image-pair-${pairIndex}`}>
+                    <h2>비교 쌍 {pairIndex + 1}</h2>
+                    <div className='write-form__image-pair-items'>
+                      {form.images.slice(startIndex, startIndex + 2).map((image, offset) => {
+                        const index = startIndex + offset
+                        return (
+                          <div
+                            className={`write-form__image-preview${draggedImageIdRef.current === image.id ? ' is-dragging' : ''}`}
+                            key={image.id}
+                            draggable
+                            onDragStart={(event) => {
+                              draggedImageIdRef.current = image.id
+                              event.dataTransfer.effectAllowed = 'move'
+                              event.dataTransfer.setData('text/plain', image.id)
+                            }}
+                            onDragOver={(event) => event.preventDefault()}
+                            onDrop={(event) => {
+                              event.preventDefault()
+                              handleImageDrop(image.id)
+                            }}
+                            onDragEnd={() => { draggedImageIdRef.current = null }}
+                          >
+                            <div className='write-form__image-drag-handle' aria-hidden='true'><GripVertical size={16} /> 사진을 끌어 순서 변경</div>
+                            <img className='write-form__preview' src={image.preview} alt={`게시물 사진 ${index + 1} 미리보기`} />
+                            <span className='write-form__image-order'>{index + 1}번째 사진</span>
+                            <input
+                              className='write-form__image-location'
+                              type='text'
+                              value={image.location ?? ''}
+                              maxLength={100}
+                              aria-label={`${index + 1}번 사진 장소 이름`}
+                              placeholder='장소 이름 (선택)'
+                              onChange={(event) => handleImageLocationChange(image.id, event.target.value)}
+                            />
+                            <button className='write-form__image-remove' type='button' aria-label={`${index + 1}번 사진 제거`} onClick={() => handleRemoveImage(image.id)}>
+                              <Trash2 size={15} aria-hidden='true' /> 사진 제거
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    {form.images.length % 2 === 1 && pairIndex === Math.floor(form.images.length / 2) && (
+                      <p className='write-form__pair-incomplete'>비교할 사진을 한 장 더 추가해 쌍을 완성해 주세요.</p>
+                    )}
+                  </section>
+                )
+              })}
+            </div>
+          ) : (
+            <div className='write-form__image-grid'>
+              {form.images.map((image, index) => (
+                <div
+                  className={`write-form__image-preview${draggedImageIdRef.current === image.id ? ' is-dragging' : ''}`}
+                  key={image.id}
+                  draggable
+                  onDragStart={(event) => {
+                    draggedImageIdRef.current = image.id
+                    event.dataTransfer.effectAllowed = 'move'
+                    event.dataTransfer.setData('text/plain', image.id)
+                  }}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => {
+                    event.preventDefault()
+                    handleImageDrop(image.id)
+                  }}
+                  onDragEnd={() => { draggedImageIdRef.current = null }}
                 >
-                  <Trash2 size={15} aria-hidden='true' />
-                  사진 제거
-                </button>
-              </div>
-            ))}
-          </div>
+                  <div className='write-form__image-drag-handle' aria-hidden='true'><GripVertical size={16} /> 사진을 끌어 순서 변경</div>
+                  <img className='write-form__preview' src={image.preview} alt={`게시물 사진 ${index + 1} 미리보기`} />
+                  <span className='write-form__image-order'>{index + 1}번째 사진</span>
+                  <button className='write-form__image-remove' type='button' aria-label={`${index + 1}번 사진 제거`} onClick={() => handleRemoveImage(image.id)}>
+                    <Trash2 size={15} aria-hidden='true' /> 사진 제거
+                  </button>
+                </div>
+              ))}
+            </div>
+          )
         )}
 
         {submitError && <p className='write-form__error' role='alert'>{submitError}</p>}
