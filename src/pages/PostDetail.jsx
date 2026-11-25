@@ -257,7 +257,12 @@ const PostDetail = ({ isAdmin }) => {
           {ownerActionError && <p className='detail-owner-error' role='alert'>{ownerActionError}</p>}
 
           {post.category === 'Portfolio' && (
-            <h1 style={{ margin: '28px 0 16px', fontSize: 'clamp(28px, 5vw, 40px)', textAlign: 'left' }}>{post.title}</h1>
+            <>
+              <h1 style={{ margin: '28px 0 8px', fontSize: 'clamp(28px, 5vw, 40px)', textAlign: 'left' }}>{post.title}</h1>
+              {portfolioImageGroups.some((group) => group.type === 'comparison') && (
+                <p className='post-detail__comparison-hint'>막대를 움직여 두 사진을 비교해 보세요</p>
+              )}
+            </>
           )}
           {post.category === 'Portfolio' ? (
             <div className='post-detail__portfolio-images'>
@@ -357,6 +362,12 @@ const PostDetail = ({ isAdmin }) => {
 
         .post-detail__images {
           width: 100%;
+        }
+
+        .post-detail__comparison-hint {
+          margin: 0 0 20px;
+          color: #6b7280;
+          font-size: 14px;
         }
 
         .detail-back-button {

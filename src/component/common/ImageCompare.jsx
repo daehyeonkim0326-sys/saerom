@@ -28,7 +28,6 @@ const ImageCompare = ({ images, title, imageNumbers = [1, 2] }) => {
         <span className='image-compare__label image-compare__label--left'>사진 {imageNumbers[0]}</span>
         <span className='image-compare__label image-compare__label--right'>사진 {imageNumbers[1]}</span>
       </div>
-      <p className='image-compare__hint'>막대를 움직여 두 사진을 비교해 보세요</p>
     </section>
   )
 }
