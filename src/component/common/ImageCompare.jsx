@@ -3,14 +3,23 @@ import './ImageCompare.scss'
 
 const ImageCompare = ({ images, title, imageNumbers = [1, 2] }) => {
   const [position, setPosition] = useState(50)
+  const [aspectRatio, setAspectRatio] = useState(null)
   const [leftImage, rightImage] = images
 
   if (!leftImage || !rightImage) return null
 
   return (
     <section className='image-compare' aria-label={`${title} ${imageNumbers[0]}번과 ${imageNumbers[1]}번 사진 비교`}>
-      <div className='image-compare__frame' style={{ '--compare-position': `${position}%` }}>
-        <img className='image-compare__image' src={leftImage} alt={`${title} 사진 ${imageNumbers[0]}`} />
+      <div className='image-compare__frame' style={{ '--compare-position': `${position}%`, ...(aspectRatio ? { aspectRatio } : {}) }}>
+        <img
+          className='image-compare__image'
+          src={leftImage}
+          alt={`${title} 사진 ${imageNumbers[0]}`}
+          onLoad={(event) => {
+            const { naturalWidth, naturalHeight } = event.currentTarget
+            if (naturalWidth && naturalHeight) setAspectRatio(`${naturalWidth} / ${naturalHeight}`)
+          }}
+        />
         <div className='image-compare__reveal'>
           <img className='image-compare__image' src={rightImage} alt={`${title} 사진 ${imageNumbers[1]}`} />
         </div>
