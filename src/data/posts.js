@@ -37,7 +37,12 @@ export const fetchPosts = async ({ category, authorId, categories, featuredOnly 
   if (category) query = query.eq('category', category)
   if (authorId) query = query.eq('author_id', authorId)
   if (categories) query = query.in('category', categories)
-  if (featuredOnly) query = query.eq('author_role', 'admin').not('image_path', 'is', null)
+  if (featuredOnly) {
+    query = query
+      .eq('author_role', 'admin')
+      .not('image_path', 'is', null)
+      .limit(5)
+  }
 
   const { data, error } = await query
   if (error) throw error
