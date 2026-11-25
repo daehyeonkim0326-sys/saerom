@@ -52,7 +52,7 @@ const PostDetail = ({ isAdmin }) => {
         location: post.imageLocations[index],
         imageNumber: index + 1,
       }
-    }).filter(Boolean)
+    }).filter(Boolean).sort((first, second) => Number(second.type === 'comparison') - Number(first.type === 'comparison'))
   })()
 
   useEffect(() => {
