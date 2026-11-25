@@ -1,0 +1,108 @@
+.image-compare {
+  margin-bottom: 20px;
+}
+.image-compare__frame {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16/10;
+  border-radius: 10px;
+  background: #e5e7eb;
+  isolation: isolate;
+}
+.image-compare__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.image-compare__reveal {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  clip-path: inset(0 calc(100% - var(--compare-position)) 0 0);
+}
+.image-compare__reveal .image-compare__image {
+  width: 100%;
+  height: 100%;
+}
+.image-compare__divider {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  left: var(--compare-position);
+  width: 2px;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  transform: translateX(-1px);
+}
+.image-compare__divider span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 42px;
+  height: 42px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #29238f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transform: translate(-50%, -50%);
+}
+.image-compare__divider span::before, .image-compare__divider span::after {
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #fff;
+  content: "";
+}
+.image-compare__divider span::before {
+  left: 10px;
+  transform: translateY(-50%) rotate(-135deg);
+}
+.image-compare__divider span::after {
+  right: 10px;
+  transform: translateY(-50%) rotate(45deg);
+}
+.image-compare__range {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: ew-resize;
+  opacity: 0;
+  touch-action: pan-y;
+}
+.image-compare__range:focus-visible {
+  outline: 3px solid #fee500;
+  outline-offset: -3px;
+  opacity: 0.01;
+}
+.image-compare__label {
+  position: absolute;
+  z-index: 1;
+  bottom: 12px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.68);
+  color: #fff;
+  font-size: 12px;
+  pointer-events: none;
+}
+.image-compare__label--left {
+  left: 12px;
+}
+.image-compare__label--right {
+  right: 12px;
+}
+.image-compare__hint {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+  text-align: center;
+}/*# sourceMappingURL=ImageCompare.css.map */

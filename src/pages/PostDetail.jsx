@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
 import { ArrowLeft, House, Pencil, Send, Trash2 } from 'lucide-react'
 import ImageSlider from '../component/common/ImageSlider'
+import ImageCompare from '../component/common/ImageCompare'
 import { deletePostImages, fetchPost, removePost } from '../data/posts'
 import { supabase } from '../lib/supabase.js'
 
@@ -224,10 +225,34 @@ const PostDetail = ({ isAdmin }) => {
           </div>
           {ownerActionError && <p className='detail-owner-error' role='alert'>{ownerActionError}</p>}
 
-          {post.images?.length > 0 && <div className='post-detail__images'><ImageSlider images={post.images} title={post.title} locations={post.category === 'Portfolio' ? post.imageLocations : []} detail transitionName={`post-image-${post.id}`} /></div>}
+          {post.category === 'Portfolio' && (
+            <h1 style={{ margin: '28px 0 16px', fontSize: 'clamp(28px, 5vw, 40px)', textAlign: 'left' }}>{post.title}</h1>
+          )}
+          {post.category === 'Portfolio' && post.images?.length >= 2 && Array.from(
+            { length: Math.floor(post.images.length / 2) },
+            (_, pairIndex) => pairIndex * 2,
+          ).map((startIndex) => (
+            <ImageCompare
+              key={`${post.id}-comparison-${startIndex}`}
+              images={post.images.slice(startIndex, startIndex + 2)}
+              title={post.title}
+              imageNumbers={[startIndex + 1, startIndex + 2]}
+            />
+          ))}
+          {post.images?.length > (post.category === 'Portfolio' ? Math.floor(post.images.length / 2) * 2 : 0) && (
+            <div className='post-detail__images'>
+              <ImageSlider
+                images={post.category === 'Portfolio' ? post.images.slice(Math.floor(post.images.length / 2) * 2) : post.images}
+                title={post.title}
+                locations={post.category === 'Portfolio' ? post.imageLocations.slice(Math.floor(post.images.length / 2) * 2) : []}
+                detail
+                transitionName={`post-image-${post.id}`}
+              />
+            </div>
+          )}
 
           <div style={{ paddingTop: '28px', textAlign: 'left' }}>
-            <h1 style={{ margin: '0 0 12px', fontSize: 'clamp(28px, 5vw, 40px)', textAlign: 'left' }}>{post.title}</h1>
+            {post.category !== 'Portfolio' && <h1 style={{ margin: '0 0 12px', fontSize: 'clamp(28px, 5vw, 40px)', textAlign: 'left' }}>{post.title}</h1>}
             <p style={{
               margin: 0,
               fontSize: '18px',
