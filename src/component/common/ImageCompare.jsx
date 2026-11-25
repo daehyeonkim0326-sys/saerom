@@ -25,8 +25,8 @@ const ImageCompare = ({ images, title, imageNumbers = [1, 2] }) => {
           aria-label='두 사진이 보이는 비율 조절'
           aria-valuetext={`사진 2가 ${position}% 보임`}
         />
-        <span className='image-compare__label image-compare__label--left'>사진 {imageNumbers[0]}</span>
-        <span className='image-compare__label image-compare__label--right'>사진 {imageNumbers[1]}</span>
+        <span className='image-compare__label image-compare__label--left'>BEFORE</span>
+        <span className='image-compare__label image-compare__label--right'>AFTER</span>
       </div>
     </section>
   )
