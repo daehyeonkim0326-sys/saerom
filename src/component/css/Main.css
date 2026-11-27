@@ -184,7 +184,7 @@
 }
 
 .home-post-card {
-  overflow: visible;
+  overflow: hidden;
   border: 1px solid #e8e6f0;
   border-radius: 10px;
   background: #fff;
@@ -353,4 +353,6 @@
   object-fit: cover;
   border-radius: 16px;
   display: block;
-}/*# sourceMappingURL=Main.css.map */
+}
+
+/*# sourceMappingURL=Main.css.map */
